@@ -18,6 +18,7 @@ import { AppShell, type AppTab } from '@/components/shell/app-shell';
 import { HomeScreenV2 } from '@/components/home/home-screen-v2';
 import { MapScreen } from '@/components/map/map-screen';
 import { AdminShell } from '@/components/admin/admin-shell';
+import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -230,8 +231,26 @@ export default function Page() {
             )}
           </div>
 
+          {(user.role === 'lecturer' || user.role === 'admin') && (
+            <div className="border-t pt-4">
+              <h2
+                className="text-sm font-bold mb-3"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Lecturer tools
+              </h2>
+              <LecturerScreen />
+            </div>
+          )}
+
           {user.role === 'admin' && (
             <div className="border-t pt-4">
+              <h2
+                className="text-sm font-bold mb-3"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Admin tools
+              </h2>
               <AdminShell user={user as any} />
             </div>
           )}

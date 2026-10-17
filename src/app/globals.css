@@ -17,13 +17,15 @@
    - Mono: Geist Mono (times, CC amounts)
    ============================================================ */
 
+/* Google Font — Space Grotesk for display headings.
+   MUST come before the Tailwind import — CSS spec: all @import rules
+   must precede any other rules. */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
-/* Google Font — Space Grotesk for display headings */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @theme inline {
   --color-background:          var(--background);
@@ -274,3 +276,4 @@ h1, h2, .display {
   transform: scale(0.97);
   transition: transform 0.08s, opacity 0.08s;
 }
+/* cache-bust 1792223468 */

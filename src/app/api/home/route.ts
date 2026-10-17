@@ -20,6 +20,7 @@ import { getWallet } from '@/lib/db/wallet';
 import { getHairState } from '@/lib/db/hair';
 import { listTimetableForUser } from '@/lib/db/academic';
 import { getConfig } from '@/lib/db/buildings';
+import { ensureTodayMassSession, checkAndApplyMissedMassFines, getMissedMassWarningsCount, hasUserCheckedInToSession } from '@/lib/sessions/mass';
 
 // Daily loop timeline (Loop A from the design doc).
 // Each block has: time (24h), label, kind. The Home screen uses this to draw
@@ -216,6 +217,40 @@ export async function GET() {
     };
   });
 
+  // ---------- mass (Phase 3) ----------
+  // Ensure today's mass session exists (weekends skipped). Then, if mass
+  // has already closed and the user didn't check in (and hasn't already
+  // been fined), apply the 500 CC missed-mass fine + Warning tier.
+  const massSession = await ensureTodayMassSession();
+  let mass: any = null;
+  let missedMassFineApplied = false;
+  let missedMassFineAmount = 0;
+  let missedMassWarningsCount = 0;
+  if (massSession.session) {
+    const s = massSession.session;
+    const isOpen = now >= s.opensAt && now < s.closesAt;
+    const checkedIn = await hasUserCheckedInToSession(user.id, s.id);
+    const fineResult = await checkAndApplyMissedMassFines(user.id);
+    missedMassFineApplied = fineResult.fineApplied;
+    missedMassFineAmount = fineResult.amount;
+    missedMassWarningsCount = await getMissedMassWarningsCount(user.id);
+
+    mass = {
+      sessionId: s.id,
+      opensAt: s.opensAt,
+      closesAt: s.closesAt,
+      isOpen,
+      checkedIn,
+      minutesUntilOpen: now < s.opensAt ? Math.ceil((s.opensAt.getTime() - now.getTime()) / 1000 / 60) : null,
+      minutesUntilClose: isOpen ? Math.ceil((s.closesAt.getTime() - now.getTime()) / 1000 / 60) : null,
+      missedWarnings: missedMassWarningsCount,
+      // The 500 CC fine is applied at most once per mass session.
+      // Surface it here so the Home screen can show "Missed mass: -500 CC".
+      fineAppliedToday: missedMassFineApplied,
+      fineAmount: missedMassFineAmount,
+    };
+  }
+
   return NextResponse.json({
     ok: true,
     now: now.toISOString(),
@@ -246,6 +281,7 @@ export async function GET() {
     wallet,
     hair,
     discipline: { tier: disciplineTier, count: disciplineEntries.length },
+    mass,
     announcements: announcements.map((a) => ({
       id: a.id,
       title: a.title,

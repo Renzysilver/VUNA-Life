@@ -51,6 +51,18 @@ type HomeResponse = {
   wallet: Wallet;
   hair: Hair;
   discipline: { tier: string | null; count: number };
+  mass: {
+    sessionId: string;
+    opensAt: string;
+    closesAt: string;
+    isOpen: boolean;
+    checkedIn: boolean;
+    minutesUntilOpen: number | null;
+    minutesUntilClose: number | null;
+    missedWarnings: number;
+    fineAppliedToday: boolean;
+    fineAmount: number;
+  } | null;
   dailyLoop: LoopBlock[];
   announcements: Announcement[];
 };
@@ -217,6 +229,49 @@ export function HomeScreenV2({ onBalanceChange }: Props) {
         </section>
       )}
 
+      {/* ══ 2b. MASS (live check-in CTA, or missed-mass fine banner) ══ */}
+      {data.mass && data.mass.isOpen && !data.mass.checkedIn && (
+        <section className="mx-4">
+          <div className="rounded-2xl bg-accent/15 border border-accent/40 p-4 flex items-center gap-3">
+            <Church className="h-5 w-5 text-accent-foreground shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-sm text-accent-foreground">
+                Mass is live — check in now
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Closes in {data.mass.minutesUntilClose ?? 0} min · 500 CC fine if you miss it
+              </div>
+            </div>
+            <MassCheckInButton sessionId={data.mass.sessionId} onDone={() => load()} />
+          </div>
+        </section>
+      )}
+      {data.mass && data.mass.checkedIn && (
+        <section className="mx-4">
+          <div className="rounded-2xl bg-primary/10 border border-primary/20 p-3 flex items-center gap-2 text-sm">
+            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+            <span>You're checked in for mass. See you at the chapel.</span>
+          </div>
+        </section>
+      )}
+      {data.mass && data.mass.fineAppliedToday && (
+        <section className="mx-4">
+          <div className="rounded-2xl bg-destructive/10 border border-destructive/30 p-4 flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-sm text-destructive">
+                Missed mass — −{data.mass.fineAmount} CC
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {data.mass.missedWarnings === 1
+                  ? 'First warning. Don\'t miss the next one.'
+                  : `${data.mass.missedWarnings} warnings on your record. Too many can stop you writing exams.`}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ══ 3. NEXT UP ═════════════════════════════════════════════════ */}
       <section className="mx-4">
         <ObligationBand obligation={data.nextObligation} />
@@ -353,6 +408,68 @@ export function HomeScreenV2({ onBalanceChange }: Props) {
 }
 
 // ── Sub-components ───────────────────────────────────────────────────────
+
+// ── Mass check-in button ────────────────────────────────────────────────
+// In production, this button would open the device camera to scan the QR
+// on the lecturer's (chaplain's) screen. In DEMO_MODE (web preview) we
+// fetch the current QR token from the API and submit it — simulating a
+// successful scan. The token validation + replay protection + device
+// check all still apply, so the anti-cheat is real.
+function MassCheckInButton({ sessionId, onDone }: { sessionId: string; onDone: () => void }) {
+  const { toast } = useToast();
+  const [busy, setBusy] = useState(false);
+
+  const handleCheckIn = async () => {
+    setBusy(true);
+    try {
+      // Fetch the current QR token (in production: scan via camera).
+      const qrRes = await fetch(`/api/sessions/${sessionId}/qr`, { cache: 'no-store' });
+      const qrData = await qrRes.json();
+      if (!qrData.ok || !qrData.token) {
+        toast({
+          title: 'Cannot check in',
+          description: qrData.message ?? 'Mass is not open.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      // Submit the token.
+      const res = await fetch(`/api/sessions/${sessionId}/check-in`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ token: qrData.token }),
+      });
+      const d = await res.json();
+      if (!d.ok) {
+        toast({
+          title: 'Check-in failed',
+          description: d.message ?? 'Try again',
+          variant: 'destructive',
+        });
+        return;
+      }
+      toast({
+        title: '✓ Checked in',
+        description: d.status === 'late' ? 'Marked late.' : 'Marked present.',
+      });
+      onDone();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Button
+      size="sm"
+      variant="default"
+      className="shrink-0"
+      disabled={busy}
+      onClick={handleCheckIn}
+    >
+      {busy ? 'Checking…' : 'Check in'}
+    </Button>
+  );
+}
 
 function ObligationBand({ obligation }: { obligation: NextObligation }) {
   const urgent = obligation.urgent;
