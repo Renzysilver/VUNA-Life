@@ -226,8 +226,15 @@ h1, h2, .display {
   backdrop-filter: blur(12px);
 }
 
-/* CC amount — gold mono */
+/* Naira amount — gold mono (was .cc-amount, kept for compat) */
 .cc-amount {
+  font-family: var(--font-mono);
+  color: var(--cc-gold);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* Alias for Naira display */
+.naira-amount {
   font-family: var(--font-mono);
   color: var(--cc-gold);
   font-weight: 700;

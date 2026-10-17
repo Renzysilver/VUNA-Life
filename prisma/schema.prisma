@@ -36,6 +36,12 @@ model User {
   isMinor           Boolean   @default(false)
   isBeta            Boolean   @default(false) // Phase 6: beta cohort flag
   avatarPath        String?   // Phase 6: onboarding checklist — which avatar style
+  // Phase 7: family background + avatar config + wardrobe
+  backgroundTier    String    @default("comfortable") // hustler|comfortable|blessed
+  backgroundRolledAt DateTime?
+  avatarConfig      String    @default("{}") // JSON: { bodyType, skinTone }
+  equippedItems     String    @default("{}") // JSON: { layer: itemId }
+  ownedItems        String    @default("[]") // JSON: [itemId, ...]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -543,7 +549,6 @@ model HustleAttempt {
 }
 
 // ---------- Phase 6: feedback ----------
-// The ONLY place free text is allowed (max 140 chars, rate-limited).
 model Feedback {
   id        String   @id @default(cuid())
   userId    String
@@ -552,4 +557,19 @@ model Feedback {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+// ---------- Phase 7: wardrobe items ----------
+model WardrobeItem {
+  id           String   @id @default(cuid())
+  name         String
+  category     String   // outfit_top|outfit_bottom|shoes|accessory_1|accessory_2|accessory_3|hair
+  variant      String   // e.g. 'white_button_down', 'navy_polo', etc.
+  price        Int      // Naira (whole)
+  layer        Int      // 1-9 (render order)
+  description  String?
+  isDesigner   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([category])
 }

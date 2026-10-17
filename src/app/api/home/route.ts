@@ -22,6 +22,7 @@ import { listTimetableForUser } from '@/lib/db/academic';
 import { getConfig } from '@/lib/db/buildings';
 import { ensureTodayMassSession, checkAndApplyMissedMassFines, getMissedMassWarningsCount, hasUserCheckedInToSession } from '@/lib/sessions/mass';
 import { ensureWeeklyAllowance } from '@/lib/economy/allowance';
+import { rollBackground, ensureMonthlyParentTransfer, getBackgroundInfo } from '@/lib/economy/background';
 
 // Daily loop timeline (Loop A from the design doc).
 // Each block has: time (24h), label, kind. The Home screen uses this to draw
@@ -107,6 +108,17 @@ export async function GET(req: Request) {
     actorId: user.id,
     ...getRequestContext(req),
   });
+
+  // ---------- Phase 7: family background + monthly parent transfer ----------
+  const bgRoll = await rollBackground({
+    userId: user.id,
+    ctx: { actorId: user.id, ...getRequestContext(req) },
+  });
+  const parentTransfer = await ensureMonthlyParentTransfer({
+    userId: user.id,
+    ctx: { actorId: user.id, ...getRequestContext(req) },
+  });
+  const backgroundInfo = await getBackgroundInfo(user.id);
 
   const hair = await getHairState(user.id);
 
@@ -293,6 +305,15 @@ export async function GET(req: Request) {
     hair,
     discipline: { tier: disciplineTier, count: disciplineEntries.length },
     allowance,
+    background: {
+      tier: backgroundInfo.tier,
+      rolledAt: backgroundInfo.rolledAt,
+      parentTransferPosted: parentTransfer.posted,
+      parentTransferAmount: parentTransfer.amount,
+      parentTransferMonth: parentTransfer.month,
+    },
+    avatarConfig: user.avatarConfig ? JSON.parse(user.avatarConfig) : null,
+    equippedItems: user.equippedItems ? JSON.parse(user.equippedItems) : {},
     // Day summary card is "ready" to wrap up after 22:00 (hostel lock).
     // The Home screen shows the DaySummaryCard component when this is true.
     daySummaryReady: now.getHours() >= 22,

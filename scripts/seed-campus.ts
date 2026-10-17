@@ -174,15 +174,16 @@ async function main() {
 
   // ---------- config defaults ----------
   const configRows: Array<[string, string, string]> = [
-    ['cc_to_naira_ratio', '10', 'Approx 1 CC = 10 naira. Used for flavour only, never for real money.'],
-    ['weekly_allowance_min', '1200', 'Min weekly allowance in CC.'],
-    ['weekly_allowance_max', '2000', 'Max weekly allowance in CC.'],
-    ['daily_earning_cap', '300', 'Starting daily earning cap in CC.'],
-    ['meal_cost_min', '100', 'Min meal cost in CC.'],
-    ['meal_cost_max', '160', 'Max meal cost in CC.'],
-    ['haircut_cost_min', '150', 'Min haircut cost in CC.'],
-    ['haircut_cost_max', '250', 'Max haircut cost in CC.'],
-    ['missed_mass_fine', '500', 'CC fine for missing compulsory faculty mass.'],
+    ['naira_currency_symbol', '"₦"', 'Currency symbol for display.'],
+    ['cc_to_naira_ratio', '10', 'Historical ratio — kept for migration reference. No longer used for pricing.'],
+    ['weekly_allowance_min', '12000', 'Min weekly allowance in Naira.'],
+    ['weekly_allowance_max', '20000', 'Max weekly allowance in Naira.'],
+    ['daily_earning_cap', '3000', 'Starting daily earning cap in Naira.'],
+    ['meal_cost_min', '300', 'Min meal cost in Naira.'],
+    ['meal_cost_max', '800', 'Max meal cost in Naira.'],
+    ['haircut_cost_min', '1500', 'Min haircut cost in Naira.'],
+    ['haircut_cost_max', '2500', 'Max haircut cost in Naira.'],
+    ['missed_mass_fine', '2500', 'Naira fine for missing compulsory faculty mass.'],
     ['hostel_lock_time', '"22:00"', 'Hostel lock time, 24h local.'],
     ['mass_start_time', '"12:10"', 'Faculty mass start time.'],
     ['mass_end_time', '"13:00"', 'Faculty mass end time.'],
@@ -375,7 +376,7 @@ async function main() {
       data: {
         fromUser: null,
         toUser: student.id,
-        amount: 1200,
+        amount: 12000,
         reason: 'weekly_allowance',
         metadata: JSON.stringify({ week: 'demo', note: 'Pocket money from home (demo)' }),
       },
@@ -383,7 +384,7 @@ async function main() {
     // Create the wallet row so reads don't have to lazy-create.
     // The wallet adapter will recompute balance from ledger on read.
     await prisma.wallet.create({
-      data: { userId: student.id, balance: 1200, earnedToday: 0, earnedTodayDate: new Date() },
+      data: { userId: student.id, balance: 12000, earnedToday: 0, earnedTodayDate: new Date() },
     });
     console.log(`[seed] demo wallet seeded: 1,200 CC weekly allowance via ledger`);
 
@@ -412,17 +413,17 @@ async function main() {
     // items table; nothing hardcoded in app code.
     await prisma.item.deleteMany({});
     const itemsSeed: Array<{ code: string; name: string; category: string; basePrice: number; metadata?: any }> = [
-      { code: 'rice_stew_sausage',  name: 'Rice and stew with sausage',       category: 'meal',  basePrice: 160, metadata: { naira: 1600, kind: 'meal' } },
-      { code: 'fried_rice_egg',    name: 'Fried rice with egg',               category: 'meal',  basePrice: 160, metadata: { naira: 1600, kind: 'meal' } },
-      { code: 'bread_egg',         name: 'Bread and egg',                     category: 'small', basePrice: 130, metadata: { naira: 1300, kind: 'small_meal' } },
-      { code: 'bread_two_eggs',    name: 'Bread with two fried eggs',         category: 'small', basePrice: 160, metadata: { naira: 1600, kind: 'small_meal' } },
-      { code: 'pancakes',          name: 'Pancakes',                          category: 'snack', basePrice: 110, metadata: { naira_range: '1000-1200', kind: 'snack' } },
-      { code: 'custard_pie',       name: 'Custard pie',                       category: 'snack', basePrice: 30,  metadata: { naira: 300, kind: 'snack' } },
-      { code: 'gala',              name: 'Gala',                              category: 'snack', basePrice: 35,  metadata: { naira_range: '300-400', kind: 'snack' } },
-      { code: 'pepsi_sprite',      name: 'Pepsi or Sprite',                   category: 'drink', basePrice: 55,  metadata: { naira_range: '500-600', kind: 'drink' } },
-      { code: 'nutri_milk',        name: 'Nutri Milk (yogurt drink)',         category: 'drink', basePrice: 80,  metadata: { naira: 800, kind: 'drink' } },
-      // Non-food items for later phases
-      { code: 'haircut_campus',    name: 'Haircut (campus barber)',           category: 'service', basePrice: 200, metadata: { naira_range: '1500-2500', kind: 'service' } },
+      { code: 'rice_stew_sausage',  name: 'Rice and stew with sausage',       category: 'meal',  basePrice: 800, metadata: { naira: 800, kind: 'meal' } },
+      { code: 'fried_rice_egg',    name: 'Fried rice with egg',               category: 'meal',  basePrice: 800, metadata: { naira: 800, kind: 'meal' } },
+      { code: 'bread_egg',         name: 'Bread and egg',                     category: 'small', basePrice: 600, metadata: { naira: 600, kind: 'small_meal' } },
+      { code: 'bread_two_eggs',    name: 'Bread with two fried eggs',         category: 'small', basePrice: 800, metadata: { naira: 800, kind: 'small_meal' } },
+      { code: 'pancakes',          name: 'Pancakes',                          category: 'snack', basePrice: 500, metadata: { naira_range: '500-600', kind: 'snack' } },
+      { code: 'custard_pie',       name: 'Custard pie',                       category: 'snack', basePrice: 150, metadata: { naira: 150, kind: 'snack' } },
+      { code: 'gala',              name: 'Gala',                              category: 'snack', basePrice: 175, metadata: { naira_range: '150-200', kind: 'snack' } },
+      { code: 'pepsi_sprite',      name: 'Pepsi or Sprite',                   category: 'drink', basePrice: 300, metadata: { naira: 300, kind: 'drink' } },
+      { code: 'nutri_milk',        name: 'Nutri Milk (yogurt drink)',         category: 'drink', basePrice: 400, metadata: { naira: 400, kind: 'drink' } },
+      // Service item
+      { code: 'haircut_campus',    name: 'Haircut (campus barber)',           category: 'service', basePrice: 2000, metadata: { naira_range: '1500-2500', kind: 'service' } },
     ];
     for (const it of itemsSeed) {
       await prisma.item.create({
@@ -531,6 +532,64 @@ async function main() {
       update: { value: '140' },
       create: { key: 'feedback_max_chars', value: '140', description: 'Max characters in feedback body.' },
     });
+
+    // ---------- Phase 7: wardrobe items (30+ items) ----------
+    // All prices in Naira. No real brand names — "inspired by" only.
+    // HARD RULE: No real brand logos in SVG.
+    await prisma.wardrobeItem.deleteMany({});
+    const wardrobeSeed: Array<{ name: string; category: string; variant: string; price: number; layer: number; isDesigner?: boolean; description?: string }> = [
+      // Shirts (outfit_top, layer 3)
+      { name: 'White button-down', category: 'outfit_top', variant: 'white_button_down', price: 3500, layer: 3, description: 'Clean white shirt for lectures.' },
+      { name: 'Navy polo', category: 'outfit_top', variant: 'navy_polo', price: 2800, layer: 3, description: 'Smart-casual navy polo.' },
+      { name: 'Lagos streetwear hoodie', category: 'outfit_top', variant: 'lagos_streetwear_hoodie', price: 8000, layer: 3, description: 'Street-ready hoodie for the hustle.' },
+      { name: 'Ankara print shirt', category: 'outfit_top', variant: 'ankara_print_shirt', price: 6500, layer: 3, description: 'Vibrant Ankara print.' },
+      { name: 'Designer polo', category: 'outfit_top', variant: 'gucci_inspired_polo', price: 45000, layer: 3, isDesigner: true, description: 'Luxury-inspired polo. Flex with care.' },
+      // Trousers (outfit_bottom, layer 4)
+      { name: 'Black chinos', category: 'outfit_bottom', variant: 'black_chinos', price: 4000, layer: 4, description: 'Versatile black chinos.' },
+      { name: 'Cargo pants', category: 'outfit_bottom', variant: 'cargo_pants', price: 5500, layer: 4, description: 'Street cargo pants.' },
+      { name: 'Ankara trousers', category: 'outfit_bottom', variant: 'ankara_trousers', price: 7000, layer: 4, description: 'Matching Ankara trousers.' },
+      { name: 'Designer joggers', category: 'outfit_bottom', variant: 'balenciaga_inspired_joggers', price: 55000, layer: 4, isDesigner: true, description: 'Luxury-inspired joggers.' },
+      // Shoes (layer 5)
+      { name: 'White sneakers', category: 'shoes', variant: 'white_sneakers', price: 12000, layer: 5, description: 'Crisp white sneakers.' },
+      { name: 'Brown loafers', category: 'shoes', variant: 'brown_loafers', price: 8500, layer: 5, description: 'Smart brown loafers.' },
+      { name: 'Slides', category: 'shoes', variant: 'slides', price: 2500, layer: 5, description: 'Easy slides for the hostel.' },
+      { name: 'Designer sneakers', category: 'shoes', variant: 'yeezy_inspired_sneakers', price: 65000, layer: 5, isDesigner: true, description: 'Luxury-inspired sneakers.' },
+      // Chains (accessory_1, layer 6)
+      { name: 'Gold chain', category: 'accessory_1', variant: 'gold_chain', price: 3000, layer: 6, description: 'Simple gold chain.' },
+      { name: 'Silver chain', category: 'accessory_1', variant: 'silver_chain', price: 1800, layer: 6, description: 'Simple silver chain.' },
+      { name: 'Rosary', category: 'accessory_1', variant: 'rosary', price: 500, layer: 6, description: 'Faith pathway rosary bead.' },
+      // Watches (accessory_2, layer 7)
+      { name: 'Casio-style watch', category: 'accessory_2', variant: 'casio_style', price: 4500, layer: 7, description: 'Reliable digital watch.' },
+      { name: 'Designer watch', category: 'accessory_2', variant: 'ap_inspired', price: 120000, layer: 7, isDesigner: true, description: 'Luxury-inspired timepiece. Big flex.' },
+      // Glasses (accessory_3, layer 8)
+      { name: 'Round frames', category: 'accessory_3', variant: 'round_frames', price: 2000, layer: 8, description: 'Stylish round glasses.' },
+      { name: 'Shades', category: 'accessory_3', variant: 'shades', price: 3500, layer: 8, description: 'Dark sunglasses.' },
+    ];
+    for (const w of wardrobeSeed) {
+      await prisma.wardrobeItem.create({
+        data: {
+          name: w.name,
+          category: w.category,
+          variant: w.variant,
+          price: w.price,
+          layer: w.layer,
+          description: w.description ?? null,
+          isDesigner: w.isDesigner ?? false,
+        },
+      });
+    }
+    console.log(`[seed] wardrobe items inserted: ${wardrobeSeed.length}`);
+
+    // Phase 7: Naira + background config
+    await prisma.config.upsert({ where: { key: 'parent_transfer_hustler_min' }, update: { value: '50000' }, create: { key: 'parent_transfer_hustler_min', value: '50000', description: 'Monthly transfer min for hustler.' } });
+    await prisma.config.upsert({ where: { key: 'parent_transfer_hustler_max' }, update: { value: '70000' }, create: { key: 'parent_transfer_hustler_max', value: '70000', description: 'Monthly transfer max for hustler.' } });
+    await prisma.config.upsert({ where: { key: 'parent_transfer_comfortable_min' }, update: { value: '50000' }, create: { key: 'parent_transfer_comfortable_min', value: '50000', description: 'Monthly transfer min for comfortable.' } });
+    await prisma.config.upsert({ where: { key: 'parent_transfer_comfortable_max' }, update: { value: '150000' }, create: { key: 'parent_transfer_comfortable_max', value: '150000', description: 'Monthly transfer max for comfortable.' } });
+    await prisma.config.upsert({ where: { key: 'parent_transfer_blessed_min' }, update: { value: '200000' }, create: { key: 'parent_transfer_blessed_min', value: '200000', description: 'Monthly transfer min for blessed.' } });
+    await prisma.config.upsert({ where: { key: 'parent_transfer_blessed_max' }, update: { value: '400000' }, create: { key: 'parent_transfer_blessed_max', value: '400000', description: 'Monthly transfer max for blessed.' } });
+    await prisma.config.upsert({ where: { key: 'background_hustler_weight' }, update: { value: '0.40' }, create: { key: 'background_hustler_weight', value: '0.40', description: 'P(hustler).' } });
+    await prisma.config.upsert({ where: { key: 'background_comfortable_weight' }, update: { value: '0.45' }, create: { key: 'background_comfortable_weight', value: '0.45', description: 'P(comfortable).' } });
+    await prisma.config.upsert({ where: { key: 'background_blessed_weight' }, update: { value: '0.15' }, create: { key: 'background_blessed_weight', value: '0.15', description: 'P(blessed).' } });
 
     console.log(`[seed] demo user ${student.email} + Phase 4 sample data seeded`);
   } else {

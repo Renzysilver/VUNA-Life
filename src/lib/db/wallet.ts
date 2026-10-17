@@ -175,6 +175,9 @@ export async function postLedgerEntry(args: {
   // ── Daily earning cap: clip earnings at the cap (don't refuse —
   // the user just gets less than requested).
   let capped = false;
+  // Earning reasons subject to the daily cap. parent_transfer and
+  // weekly_allowance are EXEMPT — they come from outside the game
+  // (parents / allowance) and should not be blocked by the cap.
   const earningReasons = ['earning', 'goal_reward', 'hustle_sale', 'campus_job', 'mass_attendance'];
   if (args.toUser && earningReasons.includes(args.reason)) {
     const wallet = await getWallet(args.toUser);
