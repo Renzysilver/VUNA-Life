@@ -1,0 +1,3977 @@
+{
+ "campus": "Veritas University Abuja (Bwari)",
+ "version": "map-v1-approximate",
+ "units": "px in source image, plus local_m",
+ "scale": {
+  "m_per_px": 0.7634
+ },
+ "north": "ASSUMED up, not verified",
+ "georeference": null,
+ "main_gate_inferred": {
+  "px": [
+   632,
+   100
+  ],
+  "status": "INFERRED_FROM_USER_DESCRIPTION_CONFIRM"
+ },
+ "roads": [
+  {
+   "id": "outer_road",
+   "kind": "main",
+   "width_px": 15,
+   "polyline_px": [
+    [
+     676,
+     -10
+    ],
+    [
+     655,
+     60
+    ],
+    [
+     625,
+     125
+    ],
+    [
+     585,
+     195
+    ],
+    [
+     545,
+     265
+    ],
+    [
+     505,
+     335
+    ],
+    [
+     468,
+     395
+    ],
+    [
+     425,
+     445
+    ],
+    [
+     380,
+     485
+    ],
+    [
+     325,
+     520
+    ],
+    [
+     250,
+     545
+    ],
+    [
+     150,
+     552
+    ],
+    [
+     60,
+     548
+    ],
+    [
+     -10,
+     540
+    ]
+   ],
+   "polyline_m": [
+    [
+     516.0,
+     -7.6
+    ],
+    [
+     500.0,
+     45.8
+    ],
+    [
+     477.1,
+     95.4
+    ],
+    [
+     446.6,
+     148.9
+    ],
+    [
+     416.0,
+     202.3
+    ],
+    [
+     385.5,
+     255.7
+    ],
+    [
+     357.3,
+     301.5
+    ],
+    [
+     324.4,
+     339.7
+    ],
+    [
+     290.1,
+     370.2
+    ],
+    [
+     248.1,
+     396.9
+    ],
+    [
+     190.8,
+     416.0
+    ],
+    [
+     114.5,
+     421.4
+    ],
+    [
+     45.8,
+     418.3
+    ],
+    [
+     -7.6,
+     412.2
+    ]
+   ]
+  },
+  {
+   "id": "campus_main_road",
+   "kind": "main",
+   "width_px": 17,
+   "polyline_px": [
+    [
+     632,
+     100
+    ],
+    [
+     668,
+     128
+    ],
+    [
+     703,
+     160
+    ],
+    [
+     728,
+     205
+    ],
+    [
+     745,
+     260
+    ],
+    [
+     752,
+     315
+    ],
+    [
+     764,
+     370
+    ],
+    [
+     780,
+     435
+    ],
+    [
+     800,
+     500
+    ],
+    [
+     822,
+     565
+    ],
+    [
+     845,
+     630
+    ],
+    [
+     855,
+     700
+    ],
+    [
+     860,
+     800
+    ],
+    [
+     862,
+     900
+    ],
+    [
+     861,
+     1000
+    ],
+    [
+     862,
+     1090
+    ],
+    [
+     878,
+     1150
+    ],
+    [
+     900,
+     1225
+    ],
+    [
+     918,
+     1300
+    ],
+    [
+     925,
+     1380
+    ],
+    [
+     912,
+     1440
+    ]
+   ],
+   "polyline_m": [
+    [
+     482.4,
+     76.3
+    ],
+    [
+     509.9,
+     97.7
+    ],
+    [
+     536.6,
+     122.1
+    ],
+    [
+     555.7,
+     156.5
+    ],
+    [
+     568.7,
+     198.5
+    ],
+    [
+     574.0,
+     240.5
+    ],
+    [
+     583.2,
+     282.4
+    ],
+    [
+     595.4,
+     332.1
+    ],
+    [
+     610.7,
+     381.7
+    ],
+    [
+     627.5,
+     431.3
+    ],
+    [
+     645.0,
+     480.9
+    ],
+    [
+     652.7,
+     534.4
+    ],
+    [
+     656.5,
+     610.7
+    ],
+    [
+     658.0,
+     687.0
+    ],
+    [
+     657.3,
+     763.4
+    ],
+    [
+     658.0,
+     832.1
+    ],
+    [
+     670.2,
+     877.9
+    ],
+    [
+     687.0,
+     935.1
+    ],
+    [
+     700.8,
+     992.4
+    ],
+    [
+     706.1,
+     1053.4
+    ],
+    [
+     696.2,
+     1099.2
+    ]
+   ]
+  },
+  {
+   "id": "law_spur",
+   "kind": "road",
+   "width_px": 9,
+   "polyline_px": [
+    [
+     802,
+     452
+    ],
+    [
+     842,
+     452
+    ],
+    [
+     878,
+     430
+    ],
+    [
+     895,
+     380
+    ],
+    [
+     918,
+     335
+    ],
+    [
+     950,
+     302
+    ]
+   ],
+   "polyline_m": [
+    [
+     612.2,
+     345.0
+    ],
+    [
+     642.7,
+     345.0
+    ],
+    [
+     670.2,
+     328.2
+    ],
+    [
+     683.2,
+     290.1
+    ],
+    [
+     700.8,
+     255.7
+    ],
+    [
+     725.2,
+     230.5
+    ]
+   ]
+  },
+  {
+   "id": "chapel_spur",
+   "kind": "road",
+   "width_px": 8,
+   "polyline_px": [
+    [
+     805,
+     452
+    ],
+    [
+     850,
+     462
+    ],
+    [
+     900,
+     480
+    ],
+    [
+     930,
+     495
+    ]
+   ],
+   "polyline_m": [
+    [
+     614.5,
+     345.0
+    ],
+    [
+     648.9,
+     352.7
+    ],
+    [
+     687.0,
+     366.4
+    ],
+    [
+     709.9,
+     377.9
+    ]
+   ]
+  },
+  {
+   "id": "blocks_road",
+   "kind": "road",
+   "width_px": 9,
+   "polyline_px": [
+    [
+     752,
+     330
+    ],
+    [
+     715,
+     358
+    ],
+    [
+     680,
+     388
+    ],
+    [
+     650,
+     418
+    ],
+    [
+     625,
+     458
+    ],
+    [
+     598,
+     498
+    ],
+    [
+     565,
+     522
+    ]
+   ],
+   "polyline_m": [
+    [
+     574.0,
+     251.9
+    ],
+    [
+     545.8,
+     273.3
+    ],
+    [
+     519.1,
+     296.2
+    ],
+    [
+     496.2,
+     319.1
+    ],
+    [
+     477.1,
+     349.6
+    ],
+    [
+     456.5,
+     380.2
+    ],
+    [
+     431.3,
+     398.5
+    ]
+   ]
+  },
+  {
+   "id": "west_road",
+   "kind": "road",
+   "width_px": 9,
+   "polyline_px": [
+    [
+     -10,
+     648
+    ],
+    [
+     100,
+     652
+    ],
+    [
+     220,
+     656
+    ],
+    [
+     320,
+     650
+    ],
+    [
+     385,
+     632
+    ],
+    [
+     440,
+     608
+    ],
+    [
+     480,
+     585
+    ]
+   ],
+   "polyline_m": [
+    [
+     -7.6,
+     494.7
+    ],
+    [
+     76.3,
+     497.7
+    ],
+    [
+     167.9,
+     500.8
+    ],
+    [
+     244.3,
+     496.2
+    ],
+    [
+     293.9,
+     482.4
+    ],
+    [
+     335.9,
+     464.1
+    ],
+    [
+     366.4,
+     446.6
+    ]
+   ]
+  },
+  {
+   "id": "hostel_track",
+   "kind": "path",
+   "width_px": 7,
+   "polyline_px": [
+    [
+     912,
+     1440
+    ],
+    [
+     880,
+     1495
+    ],
+    [
+     830,
+     1532
+    ],
+    [
+     760,
+     1558
+    ],
+    [
+     690,
+     1566
+    ],
+    [
+     620,
+     1555
+    ],
+    [
+     598,
+     1548
+    ]
+   ],
+   "polyline_m": [
+    [
+     696.2,
+     1099.2
+    ],
+    [
+     671.8,
+     1141.2
+    ],
+    [
+     633.6,
+     1169.5
+    ],
+    [
+     580.2,
+     1189.3
+    ],
+    [
+     526.7,
+     1195.4
+    ],
+    [
+     473.3,
+     1187.0
+    ],
+    [
+     456.5,
+     1181.7
+    ]
+   ]
+  },
+  {
+   "id": "hostel_rs_spur",
+   "kind": "path",
+   "width_px": 6,
+   "polyline_px": [
+    [
+     790,
+     1552
+    ],
+    [
+     770,
+     1580
+    ]
+   ],
+   "polyline_m": [
+    [
+     603.1,
+     1184.7
+    ],
+    [
+     587.8,
+     1206.1
+    ]
+   ]
+  }
+ ],
+ "tracks": [
+  {
+   "polyline_px": [
+    [
+     852,
+     708
+    ],
+    [
+     760,
+     714
+    ],
+    [
+     690,
+     720
+    ],
+    [
+     645,
+     735
+    ],
+    [
+     618,
+     760
+    ],
+    [
+     592,
+     790
+    ]
+   ]
+  },
+  {
+   "polyline_px": [
+    [
+     645,
+     735
+    ],
+    [
+     652,
+     780
+    ],
+    [
+     642,
+     830
+    ],
+    [
+     632,
+     872
+    ]
+   ]
+  },
+  {
+   "polyline_px": [
+    [
+     632,
+     882
+    ],
+    [
+     692,
+     886
+    ],
+    [
+     752,
+     864
+    ],
+    [
+     792,
+     850
+    ]
+   ]
+  },
+  {
+   "polyline_px": [
+    [
+     215,
+     660
+    ],
+    [
+     218,
+     720
+    ],
+    [
+     212,
+     790
+    ],
+    [
+     206,
+     860
+    ],
+    [
+     190,
+     940
+    ]
+   ]
+  },
+  {
+   "polyline_px": [
+    [
+     300,
+     700
+    ],
+    [
+     330,
+     730
+    ],
+    [
+     345,
+     760
+    ]
+   ]
+  }
+ ],
+ "fields": [
+  {
+   "id": "F1",
+   "name": "Football field (new, big)",
+   "polygon_px": [
+    [
+     690,
+     112
+    ],
+    [
+     772,
+     42
+    ],
+    [
+     820,
+     94
+    ],
+    [
+     748,
+     186
+    ]
+   ],
+   "polygon_m": [
+    [
+     526.7,
+     85.5
+    ],
+    [
+     589.3,
+     32.1
+    ],
+    [
+     626.0,
+     71.8
+    ],
+    [
+     571.0,
+     142.0
+    ]
+   ]
+  },
+  {
+   "id": "F2",
+   "name": "Football field (old, small)",
+   "polygon_px": [
+    [
+     752,
+     205
+    ],
+    [
+     862,
+     152
+    ],
+    [
+     897,
+     242
+    ],
+    [
+     802,
+     292
+    ],
+    [
+     762,
+     244
+    ]
+   ],
+   "polygon_m": [
+    [
+     574.0,
+     156.5
+    ],
+    [
+     658.0,
+     116.0
+    ],
+    [
+     684.7,
+     184.7
+    ],
+    [
+     612.2,
+     222.9
+    ],
+    [
+     581.7,
+     186.3
+    ]
+   ]
+  }
+ ],
+ "courts": [
+  {
+   "rects": [
+    [
+     652,
+     200,
+     44,
+     24,
+     28
+    ],
+    [
+     632,
+     238,
+     34,
+     22,
+     28
+    ],
+    [
+     688,
+     236,
+     28,
+     24,
+     28
+    ]
+   ]
+  }
+ ],
+ "buildings": [
+  {
+   "id": "1",
+   "name": "Law Faculty",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      1022,
+      298
+     ],
+     "size_px": [
+      92,
+      74
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       976.0,
+       261.0
+      ],
+      [
+       1068.0,
+       261.0
+      ],
+      [
+       1068.0,
+       335.0
+      ],
+      [
+       976.0,
+       335.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       745.0,
+       199.2
+      ],
+      [
+       815.3,
+       199.2
+      ],
+      [
+       815.3,
+       255.7
+      ],
+      [
+       745.0,
+       255.7
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     1030,
+     300,
+     36,
+     34,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "2",
+   "name": "Block A",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      612,
+      322
+     ],
+     "size_px": [
+      44,
+      44
+     ],
+     "angle_deg": -25,
+     "polygon_px": [
+      [
+       582.8,
+       311.4
+      ],
+      [
+       622.6,
+       292.8
+      ],
+      [
+       641.2,
+       332.6
+      ],
+      [
+       601.4,
+       351.2
+      ]
+     ],
+     "polygon_m": [
+      [
+       444.9,
+       237.7
+      ],
+      [
+       475.3,
+       223.5
+      ],
+      [
+       489.5,
+       253.9
+      ],
+      [
+       459.1,
+       268.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     612,
+     322,
+     20,
+     20,
+     -25
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "3",
+   "name": "Block B",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      585,
+      367
+     ],
+     "size_px": [
+      42,
+      42
+     ],
+     "angle_deg": -25,
+     "polygon_px": [
+      [
+       557.1,
+       356.8
+      ],
+      [
+       595.2,
+       339.1
+      ],
+      [
+       612.9,
+       377.2
+      ],
+      [
+       574.8,
+       394.9
+      ]
+     ],
+     "polygon_m": [
+      [
+       425.3,
+       272.4
+      ],
+      [
+       454.3,
+       258.8
+      ],
+      [
+       467.9,
+       287.9
+      ],
+      [
+       438.8,
+       301.5
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     585,
+     367,
+     19,
+     19,
+     -25
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "4",
+   "name": "Block C",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      556,
+      424
+     ],
+     "size_px": [
+      50,
+      48
+     ],
+     "angle_deg": -25,
+     "polygon_px": [
+      [
+       523.2,
+       412.8
+      ],
+      [
+       568.5,
+       391.7
+      ],
+      [
+       588.8,
+       435.2
+      ],
+      [
+       543.5,
+       456.3
+      ]
+     ],
+     "polygon_m": [
+      [
+       399.4,
+       315.1
+      ],
+      [
+       434.0,
+       299.0
+      ],
+      [
+       449.5,
+       332.2
+      ],
+      [
+       414.9,
+       348.3
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     556,
+     424,
+     22,
+     22,
+     -25
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "5",
+   "name": "Block D",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      546,
+      543
+     ],
+     "size_px": [
+      50,
+      48
+     ],
+     "angle_deg": -20,
+     "polygon_px": [
+      [
+       514.3,
+       529.0
+      ],
+      [
+       561.3,
+       511.9
+      ],
+      [
+       577.7,
+       557.0
+      ],
+      [
+       530.7,
+       574.1
+      ]
+     ],
+     "polygon_m": [
+      [
+       392.6,
+       403.8
+      ],
+      [
+       428.5,
+       390.8
+      ],
+      [
+       441.0,
+       425.2
+      ],
+      [
+       405.1,
+       438.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     546,
+     543,
+     22,
+     22,
+     -20
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "6",
+   "name": "Multipurpose Hall",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      618,
+      550
+     ],
+     "size_px": [
+      50,
+      52
+     ],
+     "angle_deg": -20,
+     "polygon_px": [
+      [
+       585.6,
+       534.1
+      ],
+      [
+       632.6,
+       517.0
+      ],
+      [
+       650.4,
+       565.9
+      ],
+      [
+       603.4,
+       583.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       447.0,
+       407.7
+      ],
+      [
+       482.9,
+       394.7
+      ],
+      [
+       496.5,
+       432.0
+      ],
+      [
+       460.6,
+       445.0
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "7",
+   "name": "Auditorium",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      786,
+      625
+     ],
+     "size_px": [
+      56,
+      46
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       758.0,
+       602.0
+      ],
+      [
+       814.0,
+       602.0
+      ],
+      [
+       814.0,
+       648.0
+      ],
+      [
+       758.0,
+       648.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       578.6,
+       459.5
+      ],
+      [
+       621.4,
+       459.5
+      ],
+      [
+       621.4,
+       494.7
+      ],
+      [
+       578.6,
+       494.7
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "8",
+   "name": "Library",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      773,
+      678
+     ],
+     "size_px": [
+      104,
+      42
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       721.0,
+       657.0
+      ],
+      [
+       825.0,
+       657.0
+      ],
+      [
+       825.0,
+       699.0
+      ],
+      [
+       721.0,
+       699.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       550.4,
+       501.5
+      ],
+      [
+       629.8,
+       501.5
+      ],
+      [
+       629.8,
+       533.6
+      ],
+      [
+       550.4,
+       533.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "9",
+   "name": "Clinic",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      630,
+      728
+     ],
+     "size_px": [
+      26,
+      40
+     ],
+     "angle_deg": 10,
+     "polygon_px": [
+      [
+       620.7,
+       706.0
+      ],
+      [
+       646.3,
+       710.6
+      ],
+      [
+       639.3,
+       750.0
+      ],
+      [
+       613.7,
+       745.4
+      ]
+     ],
+     "polygon_m": [
+      [
+       473.8,
+       539.0
+      ],
+      [
+       493.3,
+       542.4
+      ],
+      [
+       488.0,
+       572.5
+      ],
+      [
+       468.5,
+       569.0
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "10",
+   "name": "Faculty of Medicine / Pharmacy building",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      594,
+      798
+     ],
+     "size_px": [
+      40,
+      34
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       574.0,
+       781.0
+      ],
+      [
+       614.0,
+       781.0
+      ],
+      [
+       614.0,
+       815.0
+      ],
+      [
+       574.0,
+       815.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       438.2,
+       596.2
+      ],
+      [
+       468.7,
+       596.2
+      ],
+      [
+       468.7,
+       622.1
+      ],
+      [
+       438.2,
+       622.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "11",
+   "name": null,
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      594,
+      885
+     ],
+     "size_px": [
+      48,
+      30
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       570.0,
+       870.0
+      ],
+      [
+       618.0,
+       870.0
+      ],
+      [
+       618.0,
+       900.0
+      ],
+      [
+       570.0,
+       900.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       435.1,
+       664.1
+      ],
+      [
+       471.8,
+       664.1
+      ],
+      [
+       471.8,
+       687.0
+      ],
+      [
+       435.1,
+       687.0
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      618,
+      908
+     ],
+     "size_px": [
+      44,
+      26
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       596.0,
+       895.0
+      ],
+      [
+       640.0,
+       895.0
+      ],
+      [
+       640.0,
+       921.0
+      ],
+      [
+       596.0,
+       921.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       455.0,
+       683.2
+      ],
+      [
+       488.5,
+       683.2
+      ],
+      [
+       488.5,
+       703.1
+      ],
+      [
+       455.0,
+       703.1
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      588,
+      916
+     ],
+     "size_px": [
+      24,
+      22
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       576.0,
+       905.0
+      ],
+      [
+       600.0,
+       905.0
+      ],
+      [
+       600.0,
+       927.0
+      ],
+      [
+       576.0,
+       927.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       439.7,
+       690.8
+      ],
+      [
+       458.0,
+       690.8
+      ],
+      [
+       458.0,
+       707.6
+      ],
+      [
+       439.7,
+       707.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "12",
+   "name": null,
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      790,
+      874
+     ],
+     "size_px": [
+      32,
+      38
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       774.0,
+       855.0
+      ],
+      [
+       806.0,
+       855.0
+      ],
+      [
+       806.0,
+       893.0
+      ],
+      [
+       774.0,
+       893.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       590.8,
+       652.7
+      ],
+      [
+       615.3,
+       652.7
+      ],
+      [
+       615.3,
+       681.7
+      ],
+      [
+       590.8,
+       681.7
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      792,
+      904
+     ],
+     "size_px": [
+      70,
+      22
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       757.0,
+       893.0
+      ],
+      [
+       827.0,
+       893.0
+      ],
+      [
+       827.0,
+       915.0
+      ],
+      [
+       757.0,
+       915.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       577.9,
+       681.7
+      ],
+      [
+       631.3,
+       681.7
+      ],
+      [
+       631.3,
+       698.5
+      ],
+      [
+       577.9,
+       698.5
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "13",
+   "name": "Senate Building",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      970,
+      812
+     ],
+     "size_px": [
+      40,
+      40
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       950.0,
+       792.0
+      ],
+      [
+       990.0,
+       792.0
+      ],
+      [
+       990.0,
+       832.0
+      ],
+      [
+       950.0,
+       832.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       725.2,
+       604.6
+      ],
+      [
+       755.7,
+       604.6
+      ],
+      [
+       755.7,
+       635.1
+      ],
+      [
+       725.2,
+       635.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "34",
+   "name": "New Lecture Theatre (NLT)",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      697,
+      291
+     ],
+     "size_px": [
+      38,
+      32
+     ],
+     "angle_deg": -15,
+     "polygon_px": [
+      [
+       674.5,
+       280.5
+      ],
+      [
+       711.2,
+       270.6
+      ],
+      [
+       719.5,
+       301.5
+      ],
+      [
+       682.8,
+       311.4
+      ]
+     ],
+     "polygon_m": [
+      [
+       514.9,
+       214.1
+      ],
+      [
+       542.9,
+       206.6
+      ],
+      [
+       549.2,
+       230.2
+      ],
+      [
+       521.2,
+       237.7
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "35",
+   "name": "Bookshop",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      720,
+      330
+     ],
+     "size_px": [
+      18,
+      24
+     ],
+     "angle_deg": -15,
+     "polygon_px": [
+      [
+       708.2,
+       320.7
+      ],
+      [
+       725.6,
+       316.1
+      ],
+      [
+       731.8,
+       339.3
+      ],
+      [
+       714.4,
+       343.9
+      ]
+     ],
+     "polygon_m": [
+      [
+       540.6,
+       244.8
+      ],
+      [
+       553.9,
+       241.3
+      ],
+      [
+       558.6,
+       259.0
+      ],
+      [
+       545.4,
+       262.5
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "37",
+   "name": "Postgraduate and ICT building",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      727,
+      436
+     ],
+     "size_px": [
+      36,
+      22
+     ],
+     "angle_deg": -25,
+     "polygon_px": [
+      [
+       706.0,
+       433.6
+      ],
+      [
+       738.7,
+       418.4
+      ],
+      [
+       748.0,
+       438.4
+      ],
+      [
+       715.3,
+       453.6
+      ]
+     ],
+     "polygon_m": [
+      [
+       539.0,
+       331.0
+      ],
+      [
+       563.9,
+       319.4
+      ],
+      [
+       571.0,
+       334.6
+      ],
+      [
+       546.1,
+       346.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "chapel",
+   "name": "Chaplaincy (from map label)",
+   "category": "academic",
+   "gender_attr": null,
+   "status": "SECONDARY_SOURCE",
+   "footprints": [
+    {
+     "centre_px": [
+      968,
+      515
+     ],
+     "size_px": [
+      78,
+      48
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       929.0,
+       491.0
+      ],
+      [
+       1007.0,
+       491.0
+      ],
+      [
+       1007.0,
+       539.0
+      ],
+      [
+       929.0,
+       539.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       709.2,
+       374.8
+      ],
+      [
+       768.7,
+       374.8
+      ],
+      [
+       768.7,
+       411.5
+      ],
+      [
+       709.2,
+       411.5
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "14",
+   "name": "Paetos",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      941,
+      1077
+     ],
+     "size_px": [
+      122,
+      50
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       880.0,
+       1052.0
+      ],
+      [
+       1002.0,
+       1052.0
+      ],
+      [
+       1002.0,
+       1102.0
+      ],
+      [
+       880.0,
+       1102.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       671.8,
+       803.1
+      ],
+      [
+       764.9,
+       803.1
+      ],
+      [
+       764.9,
+       841.2
+      ],
+      [
+       671.8,
+       841.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     914,
+     1077,
+     34,
+     28,
+     0
+    ],
+    [
+     968,
+     1077,
+     34,
+     28,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "15",
+   "name": "CICL",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      985,
+      1145
+     ],
+     "size_px": [
+      88,
+      50
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       941.0,
+       1120.0
+      ],
+      [
+       1029.0,
+       1120.0
+      ],
+      [
+       1029.0,
+       1170.0
+      ],
+      [
+       941.0,
+       1170.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       718.3,
+       855.0
+      ],
+      [
+       785.5,
+       855.0
+      ],
+      [
+       785.5,
+       893.1
+      ],
+      [
+       718.3,
+       893.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     985,
+     1145,
+     60,
+     20,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "16",
+   "name": "Stanzel",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      957,
+      1203
+     ],
+     "size_px": [
+      66,
+      52
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       924.0,
+       1177.0
+      ],
+      [
+       990.0,
+       1177.0
+      ],
+      [
+       990.0,
+       1229.0
+      ],
+      [
+       924.0,
+       1229.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       705.3,
+       898.5
+      ],
+      [
+       755.7,
+       898.5
+      ],
+      [
+       755.7,
+       938.2
+      ],
+      [
+       705.3,
+       938.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     957,
+     1203,
+     36,
+     26,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "17",
+   "name": "Old Kelson",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      745,
+      1183
+     ],
+     "size_px": [
+      92,
+      44
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       699.0,
+       1161.0
+      ],
+      [
+       791.0,
+       1161.0
+      ],
+      [
+       791.0,
+       1205.0
+      ],
+      [
+       699.0,
+       1205.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       533.6,
+       886.3
+      ],
+      [
+       603.8,
+       886.3
+      ],
+      [
+       603.8,
+       919.8
+      ],
+      [
+       533.6,
+       919.8
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     722,
+     1183,
+     28,
+     24,
+     0
+    ],
+    [
+     768,
+     1183,
+     28,
+     24,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "18",
+   "name": "New Kelson",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      1000,
+      1425
+     ],
+     "size_px": [
+      100,
+      40
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       950.0,
+       1405.0
+      ],
+      [
+       1050.0,
+       1405.0
+      ],
+      [
+       1050.0,
+       1445.0
+      ],
+      [
+       950.0,
+       1445.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       725.2,
+       1072.5
+      ],
+      [
+       801.5,
+       1072.5
+      ],
+      [
+       801.5,
+       1103.1
+      ],
+      [
+       725.2,
+       1103.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     985,
+     1425,
+     30,
+     20,
+     0
+    ],
+    [
+     1020,
+     1425,
+     30,
+     20,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "19",
+   "name": "Hostel R",
+   "category": "hostel",
+   "gender_attr": "boys",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      767,
+      1600
+     ],
+     "size_px": [
+      48,
+      64
+     ],
+     "angle_deg": 25,
+     "polygon_px": [
+      [
+       758.8,
+       1560.9
+      ],
+      [
+       802.3,
+       1581.1
+      ],
+      [
+       775.2,
+       1639.1
+      ],
+      [
+       731.7,
+       1618.9
+      ]
+     ],
+     "polygon_m": [
+      [
+       579.2,
+       1191.5
+      ],
+      [
+       612.4,
+       1207.0
+      ],
+      [
+       591.8,
+       1251.3
+      ],
+      [
+       558.6,
+       1235.8
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "20",
+   "name": "Hostel S",
+   "category": "hostel",
+   "gender_attr": "boys",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      722,
+      1608
+     ],
+     "size_px": [
+      50,
+      26
+     ],
+     "angle_deg": 20,
+     "polygon_px": [
+      [
+       703.0,
+       1587.2
+      ],
+      [
+       749.9,
+       1604.3
+      ],
+      [
+       741.0,
+       1628.8
+      ],
+      [
+       694.1,
+       1611.7
+      ]
+     ],
+     "polygon_m": [
+      [
+       536.6,
+       1211.6
+      ],
+      [
+       572.5,
+       1224.7
+      ],
+      [
+       565.7,
+       1243.3
+      ],
+      [
+       529.8,
+       1230.3
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "21",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      35,
+      683
+     ],
+     "size_px": [
+      70,
+      34
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       0.0,
+       666.0
+      ],
+      [
+       70.0,
+       666.0
+      ],
+      [
+       70.0,
+       700.0
+      ],
+      [
+       0.0,
+       700.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       0.0,
+       508.4
+      ],
+      [
+       53.4,
+       508.4
+      ],
+      [
+       53.4,
+       534.4
+      ],
+      [
+       0.0,
+       534.4
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      32,
+      735
+     ],
+     "size_px": [
+      24,
+      70
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       20.0,
+       700.0
+      ],
+      [
+       44.0,
+       700.0
+      ],
+      [
+       44.0,
+       770.0
+      ],
+      [
+       20.0,
+       770.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       15.3,
+       534.4
+      ],
+      [
+       33.6,
+       534.4
+      ],
+      [
+       33.6,
+       587.8
+      ],
+      [
+       15.3,
+       587.8
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "21b",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      27,
+      636
+     ],
+     "size_px": [
+      28,
+      28
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       13.0,
+       622.0
+      ],
+      [
+       41.0,
+       622.0
+      ],
+      [
+       41.0,
+       650.0
+      ],
+      [
+       13.0,
+       650.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       9.9,
+       474.8
+      ],
+      [
+       31.3,
+       474.8
+      ],
+      [
+       31.3,
+       496.2
+      ],
+      [
+       9.9,
+       496.2
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      56,
+      646
+     ],
+     "size_px": [
+      36,
+      28
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       38.0,
+       632.0
+      ],
+      [
+       74.0,
+       632.0
+      ],
+      [
+       74.0,
+       660.0
+      ],
+      [
+       38.0,
+       660.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       29.0,
+       482.4
+      ],
+      [
+       56.5,
+       482.4
+      ],
+      [
+       56.5,
+       503.8
+      ],
+      [
+       29.0,
+       503.8
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "22",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      137,
+      695
+     ],
+     "size_px": [
+      38,
+      46
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       118.0,
+       672.0
+      ],
+      [
+       156.0,
+       672.0
+      ],
+      [
+       156.0,
+       718.0
+      ],
+      [
+       118.0,
+       718.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       90.1,
+       513.0
+      ],
+      [
+       119.1,
+       513.0
+      ],
+      [
+       119.1,
+       548.1
+      ],
+      [
+       90.1,
+       548.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     137,
+     695,
+     16,
+     22,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "23",
+   "name": "Hostel A",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      250,
+      685
+     ],
+     "size_px": [
+      46,
+      36
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       227.0,
+       667.0
+      ],
+      [
+       273.0,
+       667.0
+      ],
+      [
+       273.0,
+       703.0
+      ],
+      [
+       227.0,
+       703.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       173.3,
+       509.2
+      ],
+      [
+       208.4,
+       509.2
+      ],
+      [
+       208.4,
+       536.6
+      ],
+      [
+       173.3,
+       536.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     250,
+     685,
+     18,
+     14,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "Hostel B",
+   "name": "Hostel B (position proposed, confirm)",
+   "category": "hostel",
+   "gender_attr": "girls",
+   "status": "PROPOSED",
+   "footprints": [
+    {
+     "centre_px": [
+      246,
+      722
+     ],
+     "size_px": [
+      42,
+      32
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       225.0,
+       706.0
+      ],
+      [
+       267.0,
+       706.0
+      ],
+      [
+       267.0,
+       738.0
+      ],
+      [
+       225.0,
+       738.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       171.8,
+       538.9
+      ],
+      [
+       203.8,
+       538.9
+      ],
+      [
+       203.8,
+       563.4
+      ],
+      [
+       171.8,
+       563.4
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     246,
+     722,
+     18,
+     14,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "24",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      125,
+      758
+     ],
+     "size_px": [
+      40,
+      34
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       105.0,
+       741.0
+      ],
+      [
+       145.0,
+       741.0
+      ],
+      [
+       145.0,
+       775.0
+      ],
+      [
+       105.0,
+       775.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       80.2,
+       565.6
+      ],
+      [
+       110.7,
+       565.6
+      ],
+      [
+       110.7,
+       591.6
+      ],
+      [
+       80.2,
+       591.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     125,
+     758,
+     16,
+     14,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "25",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      156,
+      797
+     ],
+     "size_px": [
+      44,
+      38
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       134.0,
+       778.0
+      ],
+      [
+       178.0,
+       778.0
+      ],
+      [
+       178.0,
+       816.0
+      ],
+      [
+       134.0,
+       816.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       102.3,
+       593.9
+      ],
+      [
+       135.9,
+       593.9
+      ],
+      [
+       135.9,
+       622.9
+      ],
+      [
+       102.3,
+       622.9
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      119,
+      790
+     ],
+     "size_px": [
+      32,
+      26
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       103.0,
+       777.0
+      ],
+      [
+       135.0,
+       777.0
+      ],
+      [
+       135.0,
+       803.0
+      ],
+      [
+       103.0,
+       803.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       78.6,
+       593.1
+      ],
+      [
+       103.1,
+       593.1
+      ],
+      [
+       103.1,
+       613.0
+      ],
+      [
+       78.6,
+       613.0
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     156,
+     797,
+     18,
+     16,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "26",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      154,
+      830
+     ],
+     "size_px": [
+      38,
+      42
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       135.0,
+       809.0
+      ],
+      [
+       173.0,
+       809.0
+      ],
+      [
+       173.0,
+       851.0
+      ],
+      [
+       135.0,
+       851.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       103.1,
+       617.6
+      ],
+      [
+       132.1,
+       617.6
+      ],
+      [
+       132.1,
+       649.6
+      ],
+      [
+       103.1,
+       649.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     154,
+     830,
+     15,
+     18,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "27",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      146,
+      940
+     ],
+     "size_px": [
+      28,
+      44
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       132.0,
+       918.0
+      ],
+      [
+       160.0,
+       918.0
+      ],
+      [
+       160.0,
+       962.0
+      ],
+      [
+       132.0,
+       962.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       100.8,
+       700.8
+      ],
+      [
+       122.1,
+       700.8
+      ],
+      [
+       122.1,
+       734.4
+      ],
+      [
+       100.8,
+       734.4
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      141,
+      885
+     ],
+     "size_px": [
+      22,
+      46
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       130.0,
+       862.0
+      ],
+      [
+       152.0,
+       862.0
+      ],
+      [
+       152.0,
+       908.0
+      ],
+      [
+       130.0,
+       908.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       99.2,
+       658.0
+      ],
+      [
+       116.0,
+       658.0
+      ],
+      [
+       116.0,
+       693.1
+      ],
+      [
+       99.2,
+       693.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "28",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      222,
+      873
+     ],
+     "size_px": [
+      24,
+      46
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       210.0,
+       850.0
+      ],
+      [
+       234.0,
+       850.0
+      ],
+      [
+       234.0,
+       896.0
+      ],
+      [
+       210.0,
+       896.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       160.3,
+       648.9
+      ],
+      [
+       178.6,
+       648.9
+      ],
+      [
+       178.6,
+       684.0
+      ],
+      [
+       160.3,
+       684.0
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "29",
+   "name": null,
+   "category": "hostel",
+   "gender_attr": null,
+   "status": "UNNAMED",
+   "footprints": [
+    {
+     "centre_px": [
+      260,
+      872
+     ],
+     "size_px": [
+      24,
+      44
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       248.0,
+       850.0
+      ],
+      [
+       272.0,
+       850.0
+      ],
+      [
+       272.0,
+       894.0
+      ],
+      [
+       248.0,
+       894.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       189.3,
+       648.9
+      ],
+      [
+       207.6,
+       648.9
+      ],
+      [
+       207.6,
+       682.4
+      ],
+      [
+       189.3,
+       682.4
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "36",
+   "name": "Down Cafe",
+   "category": "shop",
+   "gender_attr": null,
+   "status": "USER_CONFIRMED",
+   "footprints": [
+    {
+     "centre_px": [
+      196,
+      945
+     ],
+     "size_px": [
+      13,
+      18
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       189.5,
+       936.0
+      ],
+      [
+       202.5,
+       936.0
+      ],
+      [
+       202.5,
+       954.0
+      ],
+      [
+       189.5,
+       954.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       144.7,
+       714.5
+      ],
+      [
+       154.6,
+       714.5
+      ],
+      [
+       154.6,
+       728.2
+      ],
+      [
+       144.7,
+       728.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "30a",
+   "name": "(shop/cafe, name pending)",
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      412,
+      610
+     ],
+     "size_px": [
+      18,
+      40
+     ],
+     "angle_deg": 40,
+     "polygon_px": [
+      [
+       418.0,
+       588.9
+      ],
+      [
+       431.8,
+       600.5
+      ],
+      [
+       406.0,
+       631.1
+      ],
+      [
+       392.2,
+       619.5
+      ]
+     ],
+     "polygon_m": [
+      [
+       319.1,
+       449.5
+      ],
+      [
+       329.6,
+       458.4
+      ],
+      [
+       310.0,
+       481.8
+      ],
+      [
+       299.4,
+       472.9
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "30b",
+   "name": "(shop/cafe, name pending)",
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      392,
+      632
+     ],
+     "size_px": [
+      18,
+      26
+     ],
+     "angle_deg": 40,
+     "polygon_px": [
+      [
+       393.5,
+       616.3
+      ],
+      [
+       407.3,
+       627.8
+      ],
+      [
+       390.5,
+       647.7
+      ],
+      [
+       376.7,
+       636.2
+      ]
+     ],
+     "polygon_m": [
+      [
+       300.4,
+       470.4
+      ],
+      [
+       310.9,
+       479.3
+      ],
+      [
+       298.1,
+       494.5
+      ],
+      [
+       287.6,
+       485.6
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "30c",
+   "name": "(shop/cafe, name pending)",
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      372,
+      650
+     ],
+     "size_px": [
+      18,
+      22
+     ],
+     "angle_deg": 40,
+     "polygon_px": [
+      [
+       372.2,
+       635.8
+      ],
+      [
+       386.0,
+       647.4
+      ],
+      [
+       371.8,
+       664.2
+      ],
+      [
+       358.0,
+       652.6
+      ]
+     ],
+     "polygon_m": [
+      [
+       284.1,
+       485.3
+      ],
+      [
+       294.6,
+       494.2
+      ],
+      [
+       283.8,
+       507.0
+      ],
+      [
+       273.3,
+       498.2
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "31",
+   "name": null,
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      540,
+      632
+     ],
+     "size_px": [
+      22,
+      28
+     ],
+     "angle_deg": 10,
+     "polygon_px": [
+      [
+       531.6,
+       616.3
+      ],
+      [
+       553.3,
+       620.1
+      ],
+      [
+       548.4,
+       647.7
+      ],
+      [
+       526.7,
+       643.9
+      ]
+     ],
+     "polygon_m": [
+      [
+       405.8,
+       470.5
+      ],
+      [
+       422.3,
+       473.4
+      ],
+      [
+       418.6,
+       494.4
+      ],
+      [
+       402.1,
+       491.5
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "32",
+   "name": null,
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      470,
+      600
+     ],
+     "size_px": [
+      40,
+      17
+     ],
+     "angle_deg": 30,
+     "polygon_px": [
+      [
+       456.9,
+       582.6
+      ],
+      [
+       491.6,
+       602.6
+      ],
+      [
+       483.1,
+       617.4
+      ],
+      [
+       448.4,
+       597.4
+      ]
+     ],
+     "polygon_m": [
+      [
+       348.8,
+       444.8
+      ],
+      [
+       375.2,
+       460.0
+      ],
+      [
+       368.8,
+       471.3
+      ],
+      [
+       342.3,
+       456.0
+      ]
+     ]
+    },
+    {
+     "centre_px": [
+      490,
+      618
+     ],
+     "size_px": [
+      20,
+      12
+     ],
+     "angle_deg": 30,
+     "polygon_px": [
+      [
+       484.3,
+       607.8
+      ],
+      [
+       501.7,
+       617.8
+      ],
+      [
+       495.7,
+       628.2
+      ],
+      [
+       478.3,
+       618.2
+      ]
+     ],
+     "polygon_m": [
+      [
+       369.7,
+       464.0
+      ],
+      [
+       382.9,
+       471.6
+      ],
+      [
+       378.4,
+       479.5
+      ],
+      [
+       365.1,
+       471.9
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "33",
+   "name": null,
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      321,
+      676
+     ],
+     "size_px": [
+      46,
+      42
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       298.0,
+       655.0
+      ],
+      [
+       344.0,
+       655.0
+      ],
+      [
+       344.0,
+       697.0
+      ],
+      [
+       298.0,
+       697.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       227.5,
+       500.0
+      ],
+      [
+       262.6,
+       500.0
+      ],
+      [
+       262.6,
+       532.1
+      ],
+      [
+       227.5,
+       532.1
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": [
+    [
+     321,
+     676,
+     20,
+     18,
+     0
+    ]
+   ],
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  },
+  {
+   "id": "38",
+   "name": null,
+   "category": "shop",
+   "gender_attr": null,
+   "status": "NAME_PENDING",
+   "footprints": [
+    {
+     "centre_px": [
+      359,
+      704
+     ],
+     "size_px": [
+      22,
+      14
+     ],
+     "angle_deg": 0,
+     "polygon_px": [
+      [
+       348.0,
+       697.0
+      ],
+      [
+       370.0,
+       697.0
+      ],
+      [
+       370.0,
+       711.0
+      ],
+      [
+       348.0,
+       711.0
+      ]
+     ],
+     "polygon_m": [
+      [
+       265.6,
+       532.1
+      ],
+      [
+       282.4,
+       532.1
+      ],
+      [
+       282.4,
+       542.7
+      ],
+      [
+       265.6,
+       542.7
+      ]
+     ]
+    }
+   ],
+   "courtyard_px": null,
+   "position_status": "APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE",
+   "facing": null,
+   "entrance": null
+  }
+ ]
+}

@@ -30,25 +30,41 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (secrets — never commit). The .local.example template is the
+# only exception, since it contains only placeholder strings.
 .env*
+!.env.local.example
 
 # vercel
 .vercel
 
-
 # typescript
-*.tsbuildinfo
 next-env.d.ts
-local-*
-.claude
-.z-ai-config
-*.log
-dev.log
-dev.out.log
-test
-prompt
+*.tsbuildinfo
 
-server.log
-# Skills directory
-/skills/
+# Local dev SQLite DB and the runtime build dir
+db/*.db
+db/*.db-journal
+
+# Dev server log (contains request traces — not for the public repo)
+dev.log
+*.log
+
+# Sandbox-internal scripts (env-bootstrap, runtime builds — not part of the project)
+.zscripts/
+
+# Sandbox-internal skill files (not part of the project)
+skills/
+
+# Sandbox-internal examples and mini-services scaffolding (not part of VUNA Life)
+examples/
+mini-services/
+
+# Sandbox-internal download dir
+download/
+
+# Uploaded source files now live in the repo root, so the upload/ scratch dir is not needed
+upload/
+
+# Cookie jars from curl tests
+/tmp/cookies*.txt

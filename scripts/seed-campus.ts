@@ -53,7 +53,7 @@ type RawMap = {
   buildings: RawBuilding[];
 };
 
-const CAMPUS_JSON = resolve(process.cwd(), 'upload/veritas_campus_map.json');
+const CAMPUS_JSON = resolve(process.cwd(), 'veritas_campus_map.json');
 
 // Map JSON category values to building_category enum values (sqlite stores as text).
 function mapCategory(c: string | undefined | null): string {
