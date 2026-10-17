@@ -6,6 +6,16 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, Copy } from 'lucide-react';
 
+export type VerifiedUser = {
+  id: string;
+  email: string;
+  role: string;
+  username: string | null;
+  displayName: string | null;
+  departmentId: string | null;
+  level: number | null;
+};
+
 export function OtpConfirmForm({
   email,
   demoOtp,
@@ -16,7 +26,11 @@ export function OtpConfirmForm({
   email: string;
   demoOtp?: string;
   expiresInSec: number;
-  onVerified: () => void;
+  // onVerified receives the user object straight from the verify-otp
+  // response. We pass it up so the parent can transition to signed-in state
+  // WITHOUT needing a second fetch (which races against the cookie being
+  // committed to the browser jar, especially through the preview gateway).
+  onVerified: (user: VerifiedUser) => void;
   onBack: () => void;
 }) {
   const [code, setCode] = useState('');
@@ -43,11 +57,11 @@ export function OtpConfirmForm({
         body: JSON.stringify({ email, code }),
       });
       const data = await res.json();
-      if (!data.ok) {
+      if (!data.ok || !data.user) {
         setError(data.message ?? 'Verification failed.');
         return;
       }
-      onVerified();
+      onVerified(data.user as VerifiedUser);
     } catch {
       setError('Network error. Please try again.');
     } finally {

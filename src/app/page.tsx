@@ -192,7 +192,29 @@ export default function Page() {
                   email={state.email}
                   demoOtp={state.demoOtp}
                   expiresInSec={state.expiresInSec}
-                  onVerified={() => refresh()}
+                  onVerified={(user) => {
+                    // Transition to signed-in IMMEDIATELY from the verify-otp
+                    // response — do not wait for a second fetch of /api/student/me,
+                    // because that races against the cookie being committed
+                    // to the browser's cookie jar (a real problem through the
+                    // preview gateway). The StudentDashboard does its own fetch
+                    // of /api/student/me, which by then has the cookie ready.
+                    setState({
+                      kind: 'signed-in',
+                      user: {
+                        id: user.id,
+                        email: user.email,
+                        emailDomain: user.email.split('@')[1]?.toLowerCase() ?? '',
+                        role: user.role,
+                        username: user.username,
+                        displayName: user.displayName,
+                        departmentId: user.departmentId,
+                        level: user.level,
+                        // isVerifiedStudent is true here — they just verified.
+                        isVerifiedStudent: true,
+                      },
+                    });
+                  }}
                   onBack={() => setState({ kind: 'signed-out' })}
                 />
               </CardContent>

@@ -37,13 +37,40 @@ type MeResponse = {
 export function StudentDashboard({ user }: { user: SessionInfo }) {
   const [data, setData] = useState<MeResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+    // The dashboard mounts right after the verify-otp response. Through the
+    // preview gateway, the new session cookie may not have settled in the
+    // browser's cookie jar by the time this fetch fires — that returns a 401
+    // even though the user IS logged in. So we retry once after a brief
+    // delay if the first fetch fails with 401.
     fetch('/api/student/me', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d: MeResponse) => setData(d))
-      .finally(() => setLoading(false));
-  }, []);
+      .then(async (r) => {
+        if (cancelled) return null;
+        if (r.status === 401 && retryTick === 0) {
+          // Schedule a single retry after 500ms — enough time for the
+          // just-set cookie to be committed by the browser.
+          setTimeout(() => {
+            if (!cancelled) setRetryTick(1);
+          }, 500);
+          return null;
+        }
+        return (await r.json()) as MeResponse;
+      })
+      .then((d) => {
+        if (cancelled || !d) return;
+        setData(d);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick]);
 
   if (loading || !data) {
     return <DashboardSkeleton />;
@@ -53,7 +80,12 @@ export function StudentDashboard({ user }: { user: SessionInfo }) {
       <Card>
         <CardHeader>
           <CardTitle>Could not load your dashboard</CardTitle>
-          <CardDescription>{data.message ?? 'Unknown error.'}</CardDescription>
+          <CardDescription>
+            {data.message ?? 'Unknown error.'}{' '}
+            <span className="text-xs">
+              You are signed in as <code>{user.email}</code>. Try reloading the page.
+            </span>
+          </CardDescription>
         </CardHeader>
       </Card>
     );
