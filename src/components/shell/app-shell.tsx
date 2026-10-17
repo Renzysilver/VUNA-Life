@@ -40,9 +40,9 @@ export function AppShell({ activeTab, onTabChange, balance, online = false, chil
   }, []);
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-[#0a1628]">
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto overscroll-contain">
+    <div className="flex flex-col h-full bg-[#0a1628]" style={{ height: '100%' }}>
+      {/* Main content — fills phone frame, scrolls within */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" style={{ minHeight: 0 }}>
         {children}
       </main>
 

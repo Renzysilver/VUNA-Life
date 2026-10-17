@@ -426,7 +426,7 @@ h1, h2, .display {
 .splash-official { font-size: 12px; color: rgba(255,255,255,0.5); font-family: 'Space Grotesk', sans-serif; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 12px; }
 
 /* ── Bottom Nav (updated) ────────────────────────────────────────── */
-.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(390px, 100vw); background: rgba(10,22,40,0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); display: flex; justify-content: space-around; z-index: 200; }
+.bottom-nav { position: sticky; bottom: 0; width: 100%; background: rgba(10,22,40,0.97); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); display: flex; justify-content: space-around; z-index: 200; flex-shrink: 0; }
 .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 16px; border-radius: 16px; border: none; background: none; cursor: pointer; min-width: 52px; }
 .nav-item--active { background: rgba(45,106,79,0.25); }
 .nav-item-icon { font-size: 20px; line-height: 1; }

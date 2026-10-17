@@ -11,17 +11,32 @@ interface GameCanvasProps {
 
 export function GameCanvas({ userId, avatarConfig, onBuildingTap }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !wrapRef.current) return;
     let mounted = true;
-    (async () => {
-      const app = await createPixiApp(canvasRef.current!);
+
+    const init = async () => {
+      // Wait one animation frame so the flex container has settled its height
+      await new Promise<void>((res) => requestAnimationFrame(() => res()));
+      if (!mounted || !canvasRef.current) return;
+      const app = await createPixiApp(canvasRef.current);
       if (!mounted) return;
       await mountCampusMap(app, { avatarConfig, onBuildingTap });
-    })();
-    return () => { mounted = false; destroyPixiApp(); };
+    };
+
+    init();
+
+    return () => {
+      mounted = false;
+      destroyPixiApp();
+    };
   }, []);
 
-  return <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />;
+  return (
+    <div ref={wrapRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+    </div>
+  );
 }

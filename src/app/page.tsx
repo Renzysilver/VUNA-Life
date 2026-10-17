@@ -15,6 +15,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { AppShell, type AppTab } from '@/components/shell/app-shell';
+import { PhoneFrame } from '@/components/shell/PhoneFrame';
 import { HomeScreenV2 } from '@/components/home/home-screen-v2';
 import { MapScreen } from '@/components/map/map-screen';
 import { WalletScreen } from '@/components/wallet/wallet-screen';
@@ -231,16 +232,22 @@ export default function Page() {
 
   // ── Splash / Landing screen (Phase 8 — replaces gate scene) ──────────
   if (showGate && state.kind === 'signed-in') {
-    return <SplashScene user={state.user} balance={walletBalance ?? 0} onContinue={() => setShowGate(false)} onNewLife={() => setShowGate(false)} />;
+    return (
+      <PhoneFrame>
+        <SplashScene user={state.user} balance={walletBalance ?? 0} onContinue={() => setShowGate(false)} onNewLife={() => setShowGate(false)} />
+      </PhoneFrame>
+    );
   }
 
   // ── Wardrobe overlay (Phase 7) ────────────────────────────────────────
   if (showWardrobe) {
     return (
-      <WardrobeScreen
-        onClose={() => setShowWardrobe(false)}
-        onBalanceChange={setWalletBalance}
-      />
+      <PhoneFrame>
+        <WardrobeScreen
+          onClose={() => setShowWardrobe(false)}
+          onBalanceChange={setWalletBalance}
+        />
+      </PhoneFrame>
     );
   }
 
@@ -254,6 +261,7 @@ export default function Page() {
   };
 
   return (
+    <PhoneFrame>
     <AppShell
       activeTab={activeTab}
       onTabChange={(tab) => {
@@ -407,6 +415,7 @@ export default function Page() {
         </div>
       )}
     </AppShell>
+    </PhoneFrame>
   );
 }
 
