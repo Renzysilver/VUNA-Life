@@ -26,6 +26,7 @@ import { FeedbackButton } from '@/components/social/feedback-button';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
 import { GateArrivalScene } from '@/components/gate/gate-arrival-scene';
+// GateArrivalScene is kept for potential future use but replaced by SplashScene in Phase 8.
 import { AvatarRenderer, type AvatarConfig, type EquippedItems } from '@/components/avatar/avatar-renderer';
 import { ProfileAvatar } from '@/components/avatar/profile-avatar';
 import { WardrobeScreen } from '@/components/wardrobe/wardrobe-screen';
@@ -228,9 +229,9 @@ export default function Page() {
     );
   }
 
-  // ── Gate arrival scene (Phase 6) ────────────────────────────────────────
-  if (showGate) {
-    return <GateArrivalScene onDone={() => setShowGate(false)} />;
+  // ── Splash / Landing screen (Phase 8 — replaces gate scene) ──────────
+  if (showGate && state.kind === 'signed-in') {
+    return <SplashScene user={state.user} balance={walletBalance ?? 0} onContinue={() => setShowGate(false)} onNewLife={() => setShowGate(false)} />;
   }
 
   // ── Wardrobe overlay (Phase 7) ────────────────────────────────────────
@@ -270,9 +271,18 @@ export default function Page() {
       )}
 
       {activeTab === 'home' && (
-        <div className="px-0">
-          <HomeScreenV2 onBalanceChange={setWalletBalance} />
-        </div>
+        <HomeScreenV2
+          user={user}
+          onNavigate={(route: string) => {
+            // Map home screen app routes to existing tabs
+            if (route === 'map') setActiveTab('map');
+            else if (route === 'wallet' || route === 'hustle') { setActiveTab('wallet'); if (route === 'hustle') setWalletSubView('hustle'); }
+            else if (route === 'people') setActiveTab('people');
+            else if (route === 'profile') setActiveTab('profile');
+            else if (route === 'wardrobe') setShowWardrobe(true);
+          }}
+          balanceNaira={walletBalance ?? 0}
+        />
       )}
 
       {activeTab === 'wallet' && (
@@ -397,5 +407,51 @@ export default function Page() {
         </div>
       )}
     </AppShell>
+  );
+}
+
+// ── Phase 8: Splash / Landing screen ─────────────────────────────────────
+function SplashScene({ user, balance, onContinue, onNewLife }: { user: SessionInfo; balance: number; onContinue: () => void; onNewLife: () => void }) {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  return (
+    <div className="splash-screen">
+      <div className="splash-bg" />
+      <div className="splash-logo">
+        <span style={{ color: 'white' }}>VUNA</span><span style={{ color: '#c9a227' }}>Life</span>
+        <div className="splash-tagline">Live your campus story.</div>
+      </div>
+      <div className="splash-room">
+        <DormRoomIllustration />
+      </div>
+      <div className="splash-player-card">
+        <div className="splash-avatar-mini">
+          <ProfileAvatar size="tiny" />
+        </div>
+        <div>
+          <div className="splash-player-name">{user.username ?? user.displayName ?? 'Student'}</div>
+          <div className="splash-player-sub">
+            {new Date().toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'short' })} · ₦{balance.toLocaleString('en-NG')}
+          </div>
+        </div>
+      </div>
+      <button className="splash-btn splash-btn--primary" onClick={onContinue}>Continue</button>
+      <button className="splash-btn splash-btn--ghost" onClick={onNewLife}>New life</button>
+      <div className="splash-socials"><span className="splash-official">✅ Official</span></div>
+    </div>
+  );
+}
+
+function DormRoomIllustration() {
+  return (
+    <div className="dorm-room-iso">
+      <div className="iso-floor" />
+      <div className="iso-wall-left" />
+      <div className="iso-wall-right" />
+      <div className="iso-bed"><div className="iso-bed-frame" /><div className="iso-bed-mattress" /><div className="iso-bed-pillow" /></div>
+      <div className="iso-desk"><div className="iso-desk-top" /></div>
+      <div className="iso-window"><div className="iso-window-pane" /></div>
+      <div className="iso-room-avatar" />
+    </div>
   );
 }

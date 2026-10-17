@@ -83,7 +83,7 @@ export function WalletScreen({ onGoToCanteen, onGoToHustle }: { onGoToCanteen?: 
           <div className="flex items-center justify-between">
             <div>
               <div className="text-[11px] text-muted-foreground uppercase tracking-wider">Balance</div>
-              <div className="cc-amount text-4xl tabular-nums">{w.balance.toLocaleString()}<span className="text-base ml-1">CC</span></div>
+              <div className="cc-amount text-4xl tabular-nums">{w.balance.toLocaleString()}<span className="text-base ml-1">₦</span></div>
             </div>
             {w.frozen && (
               <Badge variant="destructive" className="text-[10px]">
@@ -100,7 +100,7 @@ export function WalletScreen({ onGoToCanteen, onGoToHustle }: { onGoToCanteen?: 
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[11px] text-muted-foreground">
               <span>Earned today</span>
-              <span className="font-mono tabular-nums">{w.earnedToday}/{w.dailyEarningCap} CC</span>
+              <span className="font-mono tabular-nums">{w.earnedToday}/{w.dailyEarningCap} ₦</span>
             </div>
             <div className="w-full h-2 rounded-full bg-border overflow-hidden">
               <div
@@ -111,7 +111,7 @@ export function WalletScreen({ onGoToCanteen, onGoToHustle }: { onGoToCanteen?: 
             <div className="text-[11px] text-muted-foreground">
               {w.earnedToday >= w.dailyEarningCap
                 ? 'Cap reached — try again tomorrow.'
-                : `${w.dailyEarningCap - w.earnedToday} CC left to earn today.`}
+                : `${w.dailyEarningCap - w.earnedToday} ₦ left to earn today.`}
             </div>
           </div>
         </CardContent>

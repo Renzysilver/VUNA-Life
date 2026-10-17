@@ -38,7 +38,7 @@ const DAILY_LOOP: Array<{
   { time: '07:45', label: 'Breakfast', kind: 'breakfast', description: 'Eat well, bread and egg, or skip (hunger debuff)' },
   { time: '08:00', label: 'First class', kind: 'class', description: 'Scan the rotating QR or skip' },
   { time: '10:00', label: 'Free block', kind: 'free', description: 'Library, socialise, or start a campus job' },
-  { time: '12:10', label: 'Mass rush', kind: 'mass', description: 'Compulsory faculty mass at the Chapel — 500 CC fine if you miss' },
+  { time: '12:10', label: 'Mass rush', kind: 'mass', description: 'Compulsory faculty mass at the Chapel — 500 ₦ fine if you miss' },
   { time: '13:00', label: 'Lunch', kind: 'lunch', description: 'AC Canteen queue, vendor, or hostel provisions' },
   { time: '14:00', label: 'Class block 2', kind: 'class', description: 'QR check-in' },
   { time: '16:00', label: 'Free', kind: 'free', description: 'Sports, club, or hustle prep' },
@@ -242,7 +242,7 @@ export async function GET(req: Request) {
   // ---------- mass (Phase 3) ----------
   // Ensure today's mass session exists (weekends skipped). Then, if mass
   // has already closed and the user didn't check in (and hasn't already
-  // been fined), apply the 500 CC missed-mass fine + Warning tier.
+  // been fined), apply the 500 ₦ missed-mass fine + Warning tier.
   const massSession = await ensureTodayMassSession();
   let mass: any = null;
   let missedMassFineApplied = false;
@@ -266,7 +266,7 @@ export async function GET(req: Request) {
       minutesUntilOpen: now < s.opensAt ? Math.ceil((s.opensAt.getTime() - now.getTime()) / 1000 / 60) : null,
       minutesUntilClose: isOpen ? Math.ceil((s.closesAt.getTime() - now.getTime()) / 1000 / 60) : null,
       missedWarnings: missedMassWarningsCount,
-      // The 500 CC fine is applied at most once per mass session.
+      // The 500 ₦ fine is applied at most once per mass session.
       // Surface it here so the Home screen can show "Missed mass: -500 CC".
       fineAppliedToday: missedMassFineApplied,
       fineAmount: missedMassFineAmount,

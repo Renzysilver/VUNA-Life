@@ -4,7 +4,7 @@
  * Generates today's summary on demand (POST /api/day-summary/today) and
  * shows the share token + a visual card with:
  *   - Date + display name + department
- *   - CC earned + CC spent + end-of-day balance
+ *   - ₦ earned + ₦ spent + end-of-day balance
  *   - Classes attended, mass attended, goals completed
  *   - Hair stage + discipline tier + missed-mass warnings
  *   - Share URL (copyable)

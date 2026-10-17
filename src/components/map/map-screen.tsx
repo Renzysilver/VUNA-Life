@@ -1,43 +1,21 @@
 /**
- * MapScreen — full-screen campus map.
- *
- * Phase 1 (this file): renders the traced SVG full-bleed with:
- *   - pan and pinch-zoom (via CSS transform)
- *   - tappable building hit areas (transparent polygons over the SVG)
- *   - bottom sheet that slides up on tap: building name, status, and
- *     a placeholder "Activities coming in Phase 5" message
- *
- * Phase 5: replace the SVG background with MapLibre GL and wire up
- *   real activities, check-in, and presence dots.
- *
- * The SVG and JSON are served from /public/campus/.
- * Copy veritas_game_map.svg and veritas_campus_map.json there.
+ * MapScreen — PixiJS isometric campus map (Phase 8 visual overhaul)
+ * Replaces the flat SVG map with a real game canvas:
+ * - PixiJS isometric buildings with depth and shadows
+ * - Draggable by touch/mouse
+ * - Building labels as floating dark pills
+ * - Map HUD: time + day mode (top left), ₦ balance (top right), avatar circle (bottom left)
+ * - Tapping a building → ActivitiesSheet
  */
 
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { X, MapPin, Info } from 'lucide-react';
+import { GameCanvas } from '@/components/game/GameCanvas';
 import { ActivitiesSheet } from '@/components/social/activities-sheet';
+import { ProfileAvatar } from '@/components/avatar/profile-avatar';
 
-// ── Types ────────────────────────────────────────────────────────────────
-type BuildingRecord = {
-  id: string | number;
-  name: string | null;
-  category: string;
-  gender_attr: string | null;
-  status: string;
-  footprints: Array<{
-    polygon_px: [number, number][];
-  }>;
-};
-
-type CampusData = {
-  buildings: BuildingRecord[];
-};
-
-type SelectedBuilding = {
+type BuildingInfo = {
   id: string | number;
   name: string | null;
   category: string;
@@ -45,105 +23,67 @@ type SelectedBuilding = {
   gender_attr: string | null;
 };
 
-// ── Component ────────────────────────────────────────────────────────────
 export function MapScreen() {
-  const [campusData, setCampusData] = useState<CampusData | null>(null);
-  const [selected, setSelected] = useState<SelectedBuilding | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // SVG natural dimensions (from build_map.py viewport)
-  const SVG_W = 1080;
-  const SVG_H = 1817;
+  const [selected, setSelected] = useState<BuildingInfo | null>(null);
+  const [currentTime, setCurrentTime] = useState('');
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    fetch('/campus/veritas_campus_map.json')
-      .then(r => r.json())
-      .then(d => setCampusData(d))
+    const tick = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit', hour12: false }));
+    };
+    tick();
+    const id = setInterval(tick, 10000);
+    // Fetch wallet balance for the HUD
+    fetch('/api/wallet', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => { if (d.ok) setBalance(d.wallet.balance); })
       .catch(() => {});
+    return () => clearInterval(id);
   }, []);
 
-  const handleBuildingTap = (b: BuildingRecord) => {
+  const handleBuildingTap = (buildingId: string) => {
+    // Map PixiJS building IDs to building info. For now, use a simple lookup.
+    // In production, this would fetch from /api/buildings and match by pin.
     setSelected({
-      id: b.id,
-      name: b.name,
-      category: b.category,
-      status: b.status,
-      gender_attr: b.gender_attr,
+      id: buildingId,
+      name: buildingId.charAt(0).toUpperCase() + buildingId.slice(1).replace(/_/g, ' '),
+      category: 'academic',
+      status: 'USER_CONFIRMED',
+      gender_attr: null,
     });
   };
 
   return (
-    <div className="relative w-full h-[calc(100svh-8rem)] overflow-hidden bg-[oklch(0.22_0.04_145)]">
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#0a1628' }}>
+      {/* PixiJS game canvas */}
+      <GameCanvas
+        userId=""
+        avatarConfig={{}}
+        onBuildingTap={handleBuildingTap}
+      />
 
-      {/* ── SVG map, full-bleed ─────────────────────────────────────── */}
-      <div
-        ref={containerRef}
-        className="absolute inset-0 overflow-auto"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-      >
-        {/* The SVG is embedded via <img> so it renders exactly as exported.
-            Hit areas are overlaid via a positioned <svg> on top. */}
-        <div
-          className="relative"
-          style={{
-            width:  SVG_W,
-            height: SVG_H,
-            minWidth:  '100%',
-            minHeight: '100%',
-          }}
-        >
-          {/* Base map image */}
-          <img
-            src="/campus/veritas_game_map.svg"
-            alt="Veritas University campus map"
-            width={SVG_W}
-            height={SVG_H}
-            className="absolute inset-0 w-full h-full select-none pointer-events-none"
-            draggable={false}
-          />
-
-          {/* Hit area overlay */}
-          {campusData && (
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-              style={{ touchAction: 'none' }}
-            >
-              {campusData.buildings.map((b) =>
-                b.footprints.map((fp, fi) => (
-                  <polygon
-                    key={`${b.id}-${fi}`}
-                    points={fp.polygon_px.map(([x, y]) => `${x},${y}`).join(' ')}
-                    fill="transparent"
-                    stroke={selected?.id === b.id ? 'oklch(0.72 0.16 68)' : 'transparent'}
-                    strokeWidth={selected?.id === b.id ? 2 : 0}
-                    className="cursor-pointer"
-                    onClick={() => handleBuildingTap(b)}
-                    onTouchEnd={(e) => {
-                      e.preventDefault();
-                      handleBuildingTap(b);
-                    }}
-                  />
-                ))
-              )}
-            </svg>
-          )}
+      {/* Map HUD */}
+      <div className="map-hud">
+        <div className="hud-left">
+          <div className="hud-time">{currentTime}</div>
+          <div className="hud-day-mode">☀️ Day mode</div>
+        </div>
+        <div className="hud-right">
+          <span className="hud-balance">₦{balance.toLocaleString('en-NG')}</span>
+          <button className="hud-add-btn" onClick={() => {}}>+</button>
         </div>
       </div>
 
-      {/* ── Map legend chip ──────────────────────────────────────────── */}
-      <div className="absolute top-3 left-3 hud-card px-3 py-2 flex items-center gap-2 text-[11px] pointer-events-none">
-        <MapPin className="h-3.5 w-3.5 text-[var(--cc-gold)]" />
-        <span>Tap a building</span>
+      {/* Avatar circle */}
+      <div className="map-avatar-hud">
+        <div className="avatar-hud-circle">
+          <ProfileAvatar size="tiny" />
+        </div>
       </div>
 
-      {/* ── Phase label chip ──────────────────────────────────────────── */}
-      <div className="absolute top-3 right-3 hud-card px-3 py-2 flex items-center gap-1.5 text-[11px] pointer-events-none">
-        <Info className="h-3 w-3 opacity-60" />
-        <span className="opacity-60">Phase 1 map</span>
-      </div>
-
-      {/* ── Building bottom sheet (Phase 5: real activities + who-is-here) ─ */}
+      {/* Building bottom sheet */}
       {selected && (
         <ActivitiesSheet
           building={selected}

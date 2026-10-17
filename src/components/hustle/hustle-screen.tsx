@@ -83,7 +83,7 @@ export function HustleScreen({ onBalanceChange }: { onBalanceChange?: (b: number
       toast({
         title: d.sold ? '✓ Sold!' : '✗ No buyer',
         description: d.sold
-          ? `+${d.revenue} CC revenue · ${d.netProfit >= 0 ? '+' : ''}${d.netProfit} CC net · ${d.newBalance} CC left`
+          ? `+${d.revenue} ₦ revenue · ${d.netProfit >= 0 ? '+' : ''}${d.netProfit} ₦ net · ${d.newBalance} ₦ left`
           : `Stock wasted — try a lower price next time.`,
       });
       onBalanceChange?.(d.newBalance);
@@ -163,7 +163,7 @@ export function HustleScreen({ onBalanceChange }: { onBalanceChange?: (b: number
                       Cost: <span className="cc-amount">{item.purchaseCost}</span> · Suggested: <span className="cc-amount">{item.suggestedPrice}</span>
                     </div>
                     <div className="text-[10px] text-muted-foreground mt-0.5">
-                      Profit if sold: +{item.suggestedPrice - item.purchaseCost} CC
+                      Profit if sold: +{item.suggestedPrice - item.purchaseCost} ₦
                     </div>
                   </button>
                 ))}
@@ -177,7 +177,7 @@ export function HustleScreen({ onBalanceChange }: { onBalanceChange?: (b: number
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center justify-between">
                   <span>Set your price</span>
-                  <span className="cc-amount text-lg">{salePrice} CC</span>
+                  <span className="cc-amount text-lg">{salePrice} ₦</span>
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Higher price → slower sales. Lower price → fast but thin margin.
@@ -192,9 +192,9 @@ export function HustleScreen({ onBalanceChange }: { onBalanceChange?: (b: number
                   step={1}
                 />
                 <div className="flex justify-between text-[10px] text-muted-foreground">
-                  <span>{minPrice} CC (fast)</span>
-                  <span>{selectedItem.suggestedPrice} CC (suggested)</span>
-                  <span>{maxPrice} CC (slow)</span>
+                  <span>{minPrice} ₦ (fast)</span>
+                  <span>{selectedItem.suggestedPrice} ₦ (suggested)</span>
+                  <span>{maxPrice} ₦ (slow)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs">
                   {salePrice > selectedItem.suggestedPrice ? (
@@ -215,7 +215,7 @@ export function HustleScreen({ onBalanceChange }: { onBalanceChange?: (b: number
                   {busy ? 'Selling…' : `Hustle ${selectedItem.name} at ${salePrice} CC`}
                 </Button>
                 <div className="text-[10px] text-muted-foreground text-center">
-                  You pay {selectedItem.purchaseCost} CC for stock. If sold, you get {salePrice} CC back.
+                  You pay {selectedItem.purchaseCost} ₦ for stock. If sold, you get {salePrice} ₦ back.
                 </div>
               </CardContent>
             </Card>

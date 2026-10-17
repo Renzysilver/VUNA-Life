@@ -177,7 +177,7 @@ export function HomeScreen({
         title: d.capped ? 'Goal done (cap reached)' : 'Goal done!',
         description: d.capped
           ? `Earned the daily cap. Try again tomorrow.`
-          : `+${d.reward} CC, +10 ${d.path ?? 'XP'} XP`,
+          : `+${d.reward} ₦, +10 ${d.path ?? 'XP'} XP`,
       });
       // Reload home data to show updated wallet + goal state.
       load();
@@ -334,21 +334,21 @@ export function HomeScreen({
               <span className="flex items-center gap-2">
                 <Wallet className="h-4 w-4" /> Wallet
               </span>
-              <span className="text-lg font-bold tabular-nums">{data.wallet.balance} CC</span>
+              <span className="text-lg font-bold tabular-nums">{data.wallet.balance} ₦</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="text-xs text-muted-foreground flex items-center justify-between">
               <span>Earned today</span>
               <span className="font-mono tabular-nums">
-                {data.wallet.earnedToday}/{data.wallet.dailyEarningCap} CC
+                {data.wallet.earnedToday}/{data.wallet.dailyEarningCap} ₦
               </span>
             </div>
             <Progress value={earnedPct} className="h-2" />
             <div className="text-[11px] text-muted-foreground">
               {data.wallet.earnedToday >= data.wallet.dailyEarningCap
                 ? 'Cap reached for today — try again tomorrow.'
-                : `${data.wallet.dailyEarningCap - data.wallet.earnedToday} CC left to earn today.`}
+                : `${data.wallet.dailyEarningCap - data.wallet.earnedToday} ₦ left to earn today.`}
             </div>
           </CardContent>
         </Card>
@@ -388,7 +388,7 @@ export function HomeScreen({
               <div className="text-xs bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded p-2 flex items-center gap-1.5">
                 <ShieldAlert className="h-3 w-3 text-amber-700 dark:text-amber-300 shrink-0" />
                 <span>
-                  Inspection risk. Get a haircut at the barber (150–250 CC) before you're stopped.
+                  Inspection risk. Get a haircut at the barber (₦1,500–₦2,500) before you're stopped.
                 </span>
               </div>
             )}
@@ -594,7 +594,7 @@ function GoalCard({
         <span className="text-muted-foreground">
           {goal.path ? `${goal.path} path` : 'General'}
         </span>
-        <Badge variant="outline" className="text-[10px]">+{reward} CC</Badge>
+        <Badge variant="outline" className="text-[10px]">+{reward} ₦</Badge>
       </div>
       <Button
         size="sm"

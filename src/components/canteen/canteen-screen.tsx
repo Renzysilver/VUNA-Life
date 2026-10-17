@@ -6,8 +6,8 @@
  *      are disabled with a "frozen" hint)
  *   2. Catalog grid: items grouped by category (meal / small / snack / drink)
  *      with name + price (gold CC) + Buy button
- *   3. Toast on purchase: "+1 Nutri Milk added · 1,145 CC left" or
- *      "Not enough CC — you need 80" if insufficient
+ *   3. Toast on purchase: "+1 Nutri Milk added · 1,145 ₦ left" or
+ *      "Not enough ₦ — you need 80" if insufficient
  */
 
 'use client';
@@ -98,7 +98,7 @@ export function CanteenScreen() {
       }
       toast({
         title: '✓ Bought',
-        description: `+1 ${item.name} · ${d.newBalance} CC left`,
+        description: `+1 ${item.name} · ${d.newBalance} ₦ left`,
       });
       // Update wallet balance locally (don't full-reload)
       if (wallet && d.newBalance !== undefined) {
@@ -127,7 +127,7 @@ export function CanteenScreen() {
         <CardContent className="p-4 flex items-center justify-between">
           <div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider">Balance</div>
-            <div className="cc-amount text-2xl">{wallet.balance.toLocaleString()} CC</div>
+            <div className="cc-amount text-2xl">{wallet.balance.toLocaleString()} ₦</div>
           </div>
           {wallet.frozen ? (
             <Badge variant="destructive" className="text-[10px]">
@@ -174,7 +174,7 @@ export function CanteenScreen() {
                     {it.metadata?.naira ? `${it.metadata.naira}₦` : it.metadata?.naira_range ? `${it.metadata.naira_range}₦` : ''}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="cc-amount text-sm">{it.basePrice} CC</span>
+                    <span className="cc-amount text-sm">{it.basePrice} ₦</span>
                     <Button
                       size="sm"
                       variant={affordable ? 'default' : 'outline'}

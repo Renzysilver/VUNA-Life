@@ -62,7 +62,7 @@ function activitiesForBuilding(b: BuildingInfo): Activity[] {
     out.push({
       type: 'study',
       label: 'Study for 30 minutes',
-      description: '+25 CC, +10 Scholar XP',
+      description: '+25 ₦, +10 Scholar XP',
       rewardCC: 25,
       xpPath: 'Scholar',
       xpAmount: 10,
@@ -72,7 +72,7 @@ function activitiesForBuilding(b: BuildingInfo): Activity[] {
     out.push({
       type: 'eat',
       label: 'Eat at the canteen',
-      description: '+15 CC, +10 Social XP',
+      description: '+15 ₦, +10 Social XP',
       rewardCC: 15,
       xpPath: 'Social',
       xpAmount: 10,
@@ -82,7 +82,7 @@ function activitiesForBuilding(b: BuildingInfo): Activity[] {
     out.push({
       type: 'checkin',
       label: 'Check in at mass',
-      description: '+50 CC, +10 Faith XP',
+      description: '+50 ₦, +10 Faith XP',
       rewardCC: 50,
       xpPath: 'Faith',
       xpAmount: 10,
@@ -102,7 +102,7 @@ function activitiesForBuilding(b: BuildingInfo): Activity[] {
     out.push({
       type: 'checkin',
       label: 'Train for 30 minutes',
-      description: '+20 CC, +10 Athlete XP',
+      description: '+20 ₦, +10 Athlete XP',
       rewardCC: 20,
       xpPath: 'Athlete',
       xpAmount: 10,
@@ -161,7 +161,7 @@ export function ActivitiesSheet({
       toast({
         title: '✓ Done',
         description: a.rewardCC > 0
-          ? `+${d.rewardCC} CC · +${d.xpAmount} ${d.xpPath} XP · ${d.newBalance} CC left`
+          ? `+${d.rewardCC} ₦ · +${d.xpAmount} ${d.xpPath} XP · ${d.newBalance} ₦ left`
           : `Presence updated · ${d.newBalance} CC`,
       });
     } finally {
