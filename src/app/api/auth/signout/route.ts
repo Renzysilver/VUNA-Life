@@ -1,0 +1,9 @@
+// POST /api/auth/signout — clears the session cookie.
+import { NextResponse } from 'next/server';
+import { sessionCookieName } from '@/lib/auth/otp';
+
+export async function POST() {
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(sessionCookieName(), '', { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 0 });
+  return res;
+}

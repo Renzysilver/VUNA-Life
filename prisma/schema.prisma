@@ -1,0 +1,488 @@
+// ==========================================================================
+// VUNA Life — Prisma schema (LOCAL DEV DEMO_MODE adapter only)
+// ==========================================================================
+// IMPORTANT: This is the local dev stand-in. The PRODUCTION source of truth
+// is supabase/migrations/0001_init.sql. This schema mirrors it so the Next.js
+// app runs end-to-end in DEMO_MODE (no live Supabase credentials needed).
+//
+// When real Supabase env vars are set in .env.local, the db adapter layer
+// (src/lib/db/index.ts) bypasses Prisma entirely and uses @supabase/supabase-js.
+// Prisma is the local dev shim only — per the design doc, it is not used in
+// production.
+// ==========================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Prisma SQLite doesn't support enums; we use String + a CHECK constraint
+// via migrations, and validate in the application layer.
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  displayName       String?
+  username          String?   @unique
+  avatarUrl         String?
+  role              String    @default("student") // student|lecturer|admin|moderator
+  departmentId      String?
+  level             Int?      // 100..800
+  isVerifiedStudent Boolean   @default(false)
+  isMinor           Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  department        Department? @relation(fields: [departmentId], references: [id])
+  wallet            Wallet?
+  hairState         HairState?
+  disciplineRecords Discipline[]
+  fines             Fine[]
+  hellosSent        Hello[]    @relation("from_user")
+  hellosReceived    Hello[]    @relation("to_user")
+  friendshipsA      Friendship[] @relation("user_a")
+  friendshipsB      Friendship[] @relation("user_b")
+  chatsA            Chat[]     @relation("user_a")
+  chatsB            Chat[]     @relation("user_b")
+  presence          Presence?
+  stats             Stat[]
+  attendance        Attendance[]
+  inventory         Inventory[]
+  userGoals         UserGoal[]
+  daySummaries      DaySummary[]
+  eventCheckins     EventCheckin[]
+  sessions          Session[]   @relation("lecturer")
+  timetableLecturer Timetable[] @relation("lecturer")
+
+  @@index([email])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  email      String
+  otpHash    String
+  attempts   Int      @default(0)
+  consumed   Boolean  @default(false)
+  expiresAt  DateTime
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  faculty   String?
+  createdAt DateTime @default(now())
+
+  courses   Course[]
+  users     User[]
+  timetable Timetable[]
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  code         String
+  title        String
+  departmentId String?
+  level        Int?
+  credits      Int?
+  createdAt    DateTime @default(now())
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  timetable    Timetable[]
+  sessions     Session[]
+
+  @@unique([code, departmentId, level])
+}
+
+model Building {
+  id             String   @id @default(cuid())
+  pin            String   @unique
+  name           String?
+  category       String   @default("other") // academic|hostel|shop|service|sports|other
+  genderAttr     String?  // boys|girls|mixed|staff (attribute only, never in name)
+  status         String   @default("TO_VERIFY") // USER_CONFIRMED|SECONDARY_SOURCE|UNNAMED|NAME_PENDING|PROPOSED|MISSING_FROM_OLD_IMAGE|TO_VERIFY
+  positionStatus String   @default("APPROX_TRACED_FROM_OLD_SATELLITE_IMAGE")
+  facing         String?
+  centreLat      Float?
+  centreLng      Float?
+  entranceLat    Float?
+  entranceLng    Float?
+  accuracyM      Float?
+  footprints     String   @default("[]") // JSON string: array of {centre_px,size_px,angle_deg,polygon_px,polygon_m}
+  courtyardPx    String?  // JSON string: array of [cx,cy,w,h,angle] or null
+  sourceNote     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  timetable      Timetable[]
+  sessions       Session[]
+  events         Event[]
+  hellos         Hello[]
+  presence       Presence[]
+  activities     Activity[]
+
+  @@index([category])
+  @@index([status])
+}
+
+model MapRoad {
+  id         String   @id @default(cuid())
+  roadId     String
+  kind       String   // main|road|path
+  widthPx    Int
+  polylinePx String   // JSON string: array of [x,y]
+  polylineM  String   // JSON string
+  createdAt  DateTime @default(now())
+}
+
+model MapTrack {
+  id         String   @id @default(cuid())
+  polylinePx String   // JSON string
+  createdAt  DateTime @default(now())
+}
+
+model MapField {
+  id         String   @id @default(cuid())
+  fieldId    String
+  name       String?
+  polygonPx  String   // JSON string
+  polygonM   String   // JSON string
+  createdAt  DateTime @default(now())
+}
+
+model MapCourt {
+  id         String   @id @default(cuid())
+  rects      String   // JSON string: array of [x,y,w,h,angle]
+  createdAt  DateTime @default(now())
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  type       String   @default("class") // class|mass|event|exam
+  courseId   String?
+  venueId    String?
+  lecturerId String?
+  opensAt    DateTime
+  closesAt   DateTime
+  qrSeed     String
+  createdAt  DateTime @default(now())
+
+  course     Course?   @relation(fields: [courseId], references: [id])
+  venue      Building? @relation(fields: [venueId], references: [id])
+  lecturer   User?     @relation("lecturer", fields: [lecturerId], references: [id])
+  attendance Attendance[]
+
+  @@index([opensAt, closesAt])
+}
+
+model Attendance {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String
+  checkedInAt DateTime @default(now())
+  status      String   @default("present") // present|late|absent|excused
+  flag        String?
+  verifiedBy  String?
+
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([userId, checkedInAt])
+}
+
+model Event {
+  id           String   @id @default(cuid())
+  title        String
+  venueId      String?
+  startsAt     DateTime
+  endsAt       DateTime
+  isCompulsory Boolean @default(false)
+  metadata     String   @default("{}") // JSON string
+  createdAt    DateTime @default(now())
+
+  venue        Building? @relation(fields: [venueId], references: [id])
+  checkins     EventCheckin[]
+}
+
+model EventCheckin {
+  id         String   @id @default(cuid())
+  eventId     String
+  userId      String
+  checkedInAt DateTime @default(now())
+
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+model Goal {
+  id        String   @id @default(cuid())
+  title     String
+  cadence   String?  // daily|weekly|semester|long_term
+  path      String?  // Scholar|Social|Faith|Athlete|Creative|Leader
+  template  String   @default("{}") // JSON string
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  userGoals UserGoal[]
+}
+
+model UserGoal {
+  id         String   @id @default(cuid())
+  userId     String
+  goalId     String
+  status     String   @default("pending") // pending|in_progress|completed|skipped
+  assignedAt DateTime @default(now())
+  completedAt DateTime?
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal       Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, goalId])
+}
+
+model Stat {
+  id        String   @id @default(cuid())
+  userId    String
+  path      String   // Scholar|Social|Faith|Athlete|Creative|Leader
+  xp        Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, path])
+}
+
+model Timetable {
+  id           String   @id @default(cuid())
+  courseId     String
+  departmentId String?
+  level        Int?
+  weekday      Int      // 0=Sun .. 6=Sat
+  startTime    String   // HH:MM
+  endTime      String   // HH:MM
+  venueId      String?
+  lecturerId   String?
+  createdAt    DateTime @default(now())
+
+  course       Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  department   Department? @relation(fields: [departmentId], references: [id])
+  venue        Building? @relation(fields: [venueId], references: [id])
+  lecturer     User?     @relation("lecturer", fields: [lecturerId], references: [id])
+
+  @@index([weekday, startTime])
+}
+
+// HARD RULE: balance is recomputed from ledger; never written by the client.
+model Wallet {
+  userId         String   @id
+  balance        Int      @default(0)
+  earnedToday    Int      @default(0)
+  earnedTodayDate DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Ledger {
+  id        Int      @id @default(autoincrement())
+  fromUser  String?
+  toUser    String?
+  amount    Int
+  reason    String
+  metadata  String   @default("{}") // JSON string
+  createdAt DateTime @default(now())
+
+  @@index([fromUser, toUser, createdAt])
+}
+
+model Item {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  name       String
+  category   String?
+  basePrice  Int
+  metadata   String   @default("{}") // JSON string
+  createdAt  DateTime @default(now())
+
+  inventory  Inventory[]
+}
+
+model Inventory {
+  id         String   @id @default(cuid())
+  userId     String
+  itemId     String
+  quantity   Int      @default(1)
+  acquiredAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+}
+
+model Hello {
+  id          String   @id @default(cuid())
+  fromUser    String
+  toUser      String
+  buildingId  String?
+  message     String?
+  status      String   @default("pending") // pending|accepted|ignored|blocked
+  createdAt   DateTime @default(now())
+  respondedAt DateTime?
+
+  fromUserRel User     @relation("from_user", fields: [fromUser], references: [id], onDelete: Cascade)
+  toUserRel   User     @relation("to_user", fields: [toUser], references: [id], onDelete: Cascade)
+  building    Building? @relation(fields: [buildingId], references: [id])
+
+  @@unique([fromUser, toUser])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userA     String
+  userB     String
+  createdAt DateTime @default(now())
+
+  userArel  User     @relation("user_a", fields: [userA], references: [id], onDelete: Cascade)
+  userBrel  User     @relation("user_b", fields: [userB], references: [id], onDelete: Cascade)
+
+  @@unique([userA, userB])
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  userA     String
+  userB     String
+  createdAt DateTime @default(now())
+
+  userArel  User     @relation("user_a", fields: [userA], references: [id], onDelete: Cascade)
+  userBrel  User     @relation("user_b", fields: [userB], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@unique([userA, userB])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  senderId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+// EPHEMERAL — no presence history table, ever.
+model Presence {
+  userId     String   @id
+  buildingId String?
+  state      String   @default("ghost") // solid|likely|event|ghost
+  since      DateTime @default(now())
+  expiresAt  DateTime
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  building   Building? @relation(fields: [buildingId], references: [id])
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  name       String
+  venueId    String?
+  path       String?
+  metadata   String   @default("{}") // JSON string
+  createdAt  DateTime @default(now())
+
+  venue      Building? @relation(fields: [venueId], references: [id])
+}
+
+model Bond {
+  id                String   @id @default(cuid())
+  userA             String
+  userB             String
+  strength          Int      @default(0)
+  lastSharedActivity DateTime?
+
+  @@unique([userA, userB])
+}
+
+model Discipline {
+  id        String   @id @default(cuid())
+  userId    String
+  tier      String   // Warning|Form|Restriction|Standing
+  reason    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+  metadata  String   @default("{}") // JSON string
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HairState {
+  userId    String   @id
+  stage     String   @default("Fresh") // Fresh|Neat|Growing|Overdue|Violation
+  lastCutAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Fine {
+  id        String   @id @default(cuid())
+  userId    String
+  amountCc Int
+  reason    String
+  paid      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  metadata  String   @default("{}") // JSON string
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DaySummary {
+  id          String   @id @default(cuid())
+  userId      String
+  summaryDate DateTime
+  payload     String   // JSON string
+  shareToken  String?  @unique
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, summaryDate])
+}
+
+model Config {
+  key        String   @id
+  value      String   // JSON string
+  description String?
+  updatedAt  DateTime @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  actorId   String?
+  action    String
+  tableName String
+  rowId     String?
+  before    String?  // JSON string
+  after     String?  // JSON string
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([tableName, rowId])
+}
