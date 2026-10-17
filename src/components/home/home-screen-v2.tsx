@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DaySummaryCard } from '@/components/day-summary/day-summary-card';
 import {
   Sun, Moon, Scissors, Church, BookOpen, Coffee,
   Store, Lock, Target, Bell, AlertTriangle,
@@ -63,6 +64,8 @@ type HomeResponse = {
     fineAppliedToday: boolean;
     fineAmount: number;
   } | null;
+  allowance: { posted: boolean; amount: number; week: string };
+  daySummaryReady: boolean;
   dailyLoop: LoopBlock[];
   announcements: Announcement[];
 };
@@ -401,6 +404,30 @@ export function HomeScreenV2({ onBalanceChange }: Props) {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* ══ 8. WEEKLY ALLOWANCE banner (only when just posted) ═══════ */}
+      {data.allowance?.posted && (
+        <section className="mx-4">
+          <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300/40 dark:border-emerald-900 p-3 flex items-center gap-3 text-sm">
+            <span className="shrink-0">💰</span>
+            <div className="flex-1">
+              <div className="font-semibold text-emerald-800 dark:text-emerald-300">
+                +{data.allowance.amount} CC weekly allowance
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Pocket money from home · week {data.allowance.week}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ 9. DAY SUMMARY card (shown after 22:00 or on demand) ════ */}
+      {data.daySummaryReady && (
+        <section className="mx-4">
+          <DaySummaryCard />
         </section>
       )}
     </div>

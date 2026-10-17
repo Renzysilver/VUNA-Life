@@ -130,12 +130,14 @@ describe('daily earning cap is enforced', () => {
     const before = await getWallet(u.id);
     const cap = before.dailyEarningCap;
 
-    // Earn cap + 50 — should clip to cap exactly.
+    // Earn cap + 50 using the 'earning' reason (no per-reason max
+    // configured, so it won't trigger impossible-gain detection). Should
+    // clip to cap exactly.
     const r = await postLedgerEntry({
       toUser: u.id,
       amount: cap + 50,
-      reason: 'goal_reward',
-      metadata: { goalId: 'test1' },
+      reason: 'earning',
+      metadata: { test: 'cap_clip' },
     });
     expect(r.capped).toBe(true);
     expect(r.earnedToday).toBe(cap); // clipped at cap, not cap + 50
@@ -144,8 +146,8 @@ describe('daily earning cap is enforced', () => {
     const r2 = await postLedgerEntry({
       toUser: u.id,
       amount: 10,
-      reason: 'goal_reward',
-      metadata: { goalId: 'test2' },
+      reason: 'earning',
+      metadata: { test: 'cap_block' },
     });
     expect(r2.capped).toBe(true);
     expect(r2.earnedToday).toBe(cap);

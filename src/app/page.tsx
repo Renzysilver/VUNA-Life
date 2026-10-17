@@ -17,6 +17,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { AppShell, type AppTab } from '@/components/shell/app-shell';
 import { HomeScreenV2 } from '@/components/home/home-screen-v2';
 import { MapScreen } from '@/components/map/map-screen';
+import { WalletScreen } from '@/components/wallet/wallet-screen';
+import { CanteenScreen } from '@/components/canteen/canteen-screen';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
 import { SignInForm } from '@/components/auth/sign-in-form';
@@ -46,6 +48,7 @@ type PageState =
 export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [activeTab, setActiveTab] = useState<AppTab>('home');
+  const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen'>('wallet');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   // Check session on mount
@@ -187,7 +190,11 @@ export default function Page() {
   return (
     <AppShell
       activeTab={activeTab}
-      onTabChange={setActiveTab}
+      onTabChange={(tab) => {
+        setActiveTab(tab);
+        // Reset wallet sub-view when leaving the wallet tab
+        if (tab !== 'wallet') setWalletSubView('wallet');
+      }}
       balance={walletBalance}
       online={user.isVerifiedStudent}
     >
@@ -202,9 +209,11 @@ export default function Page() {
       )}
 
       {activeTab === 'wallet' && (
-        <div className="p-4 text-muted-foreground text-sm text-center pt-16">
-          Wallet & ledger — Phase 4
-        </div>
+        walletSubView === 'canteen' ? (
+          <CanteenScreen />
+        ) : (
+          <WalletScreen onGoToCanteen={() => setWalletSubView('canteen')} />
+        )
       )}
 
       {activeTab === 'people' && (

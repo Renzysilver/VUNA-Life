@@ -404,7 +404,55 @@ async function main() {
     // ---------- Discipline: clean (no entries) ----------
     await prisma.discipline.deleteMany({ where: { userId: student.id } });
 
-    console.log(`[seed] demo user ${student.email} + Phase 2 sample data seeded`);
+    // ---------- Items (food table) — Phase 4 ----------
+    // Reference prices from the design doc (in naira), converted to CC at
+    // 1 CC = 10 naira (config: cc_to_naira_ratio). All prices live in the
+    // items table; nothing hardcoded in app code.
+    await prisma.item.deleteMany({});
+    const itemsSeed: Array<{ code: string; name: string; category: string; basePrice: number; metadata?: any }> = [
+      { code: 'rice_stew_sausage',  name: 'Rice and stew with sausage',       category: 'meal',  basePrice: 160, metadata: { naira: 1600, kind: 'meal' } },
+      { code: 'fried_rice_egg',    name: 'Fried rice with egg',               category: 'meal',  basePrice: 160, metadata: { naira: 1600, kind: 'meal' } },
+      { code: 'bread_egg',         name: 'Bread and egg',                     category: 'small', basePrice: 130, metadata: { naira: 1300, kind: 'small_meal' } },
+      { code: 'bread_two_eggs',    name: 'Bread with two fried eggs',         category: 'small', basePrice: 160, metadata: { naira: 1600, kind: 'small_meal' } },
+      { code: 'pancakes',          name: 'Pancakes',                          category: 'snack', basePrice: 110, metadata: { naira_range: '1000-1200', kind: 'snack' } },
+      { code: 'custard_pie',       name: 'Custard pie',                       category: 'snack', basePrice: 30,  metadata: { naira: 300, kind: 'snack' } },
+      { code: 'gala',              name: 'Gala',                              category: 'snack', basePrice: 35,  metadata: { naira_range: '300-400', kind: 'snack' } },
+      { code: 'pepsi_sprite',      name: 'Pepsi or Sprite',                   category: 'drink', basePrice: 55,  metadata: { naira_range: '500-600', kind: 'drink' } },
+      { code: 'nutri_milk',        name: 'Nutri Milk (yogurt drink)',         category: 'drink', basePrice: 80,  metadata: { naira: 800, kind: 'drink' } },
+      // Non-food items for later phases
+      { code: 'haircut_campus',    name: 'Haircut (campus barber)',           category: 'service', basePrice: 200, metadata: { naira_range: '1500-2500', kind: 'service' } },
+    ];
+    for (const it of itemsSeed) {
+      await prisma.item.create({
+        data: {
+          code: it.code,
+          name: it.name,
+          category: it.category,
+          basePrice: it.basePrice,
+          metadata: JSON.stringify(it.metadata ?? {}),
+        },
+      });
+    }
+    console.log(`[seed] items seeded: ${itemsSeed.length} (food + service)`);
+
+    // Phase 4 anomaly detection config keys
+    await prisma.config.upsert({
+      where: { key: 'anomaly_cap_breach_multiplier' },
+      update: { value: '1.5' },
+      create: { key: 'anomaly_cap_breach_multiplier', value: '1.5', description: 'If earned_today > cap × this multiplier, freeze the account.' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'anomaly_max_goal_reward' },
+      update: { value: '100' },
+      create: { key: 'anomaly_max_goal_reward', value: '100', description: 'No single goal_reward entry may exceed this.' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'anomaly_max_hustle_sale' },
+      update: { value: '500' },
+      create: { key: 'anomaly_max_hustle_sale', value: '500', description: 'No single hustle_sale entry may exceed this.' },
+    });
+
+    console.log(`[seed] demo user ${student.email} + Phase 4 sample data seeded`);
   } else {
     console.log('[seed] skipping DEMO sample data (set DEMO_SEED_SAMPLE_DATA=1 to enable)');
   }

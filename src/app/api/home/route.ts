@@ -14,13 +14,14 @@
 // pressure, daily goals, daily loop. It's the heart of the daily return hook.
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getSessionFromCookie } from '@/lib/auth/session';
+import { getSessionFromCookie, getRequestContext } from '@/lib/auth/session';
 import { ensureTodaysGoals } from '@/lib/db/goals';
 import { getWallet } from '@/lib/db/wallet';
 import { getHairState } from '@/lib/db/hair';
 import { listTimetableForUser } from '@/lib/db/academic';
 import { getConfig } from '@/lib/db/buildings';
 import { ensureTodayMassSession, checkAndApplyMissedMassFines, getMissedMassWarningsCount, hasUserCheckedInToSession } from '@/lib/sessions/mass';
+import { ensureWeeklyAllowance } from '@/lib/economy/allowance';
 
 // Daily loop timeline (Loop A from the design doc).
 // Each block has: time (24h), label, kind. The Home screen uses this to draw
@@ -68,7 +69,7 @@ function minToHHMM(min: number): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await getSessionFromCookie();
   if (!session) {
     return NextResponse.json({ ok: false, message: 'Not authenticated.' }, { status: 401 });
@@ -98,6 +99,15 @@ export async function GET() {
   const wallet = await getWallet(user.id);
 
   // ---------- hair state ----------
+  // ---------- weekly allowance (Phase 4) ----------
+  // Auto-post the weekly allowance if today is the first /api/home load of
+  // a new ISO week. Idempotent per (userId, ISO week). Posts through the
+  // append-only ledger — server-side only.
+  const allowance = await ensureWeeklyAllowance(user.id, {
+    actorId: user.id,
+    ...getRequestContext(req),
+  });
+
   const hair = await getHairState(user.id);
 
   // ---------- discipline (highest active tier) ----------
@@ -281,6 +291,10 @@ export async function GET() {
     wallet,
     hair,
     discipline: { tier: disciplineTier, count: disciplineEntries.length },
+    allowance,
+    // Day summary card is "ready" to wrap up after 22:00 (hostel lock).
+    // The Home screen shows the DaySummaryCard component when this is true.
+    daySummaryReady: now.getHours() >= 22,
     mass,
     announcements: announcements.map((a) => ({
       id: a.id,
