@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { X, MapPin, Info } from 'lucide-react';
+import { ActivitiesSheet } from '@/components/social/activities-sheet';
 
 // ── Types ────────────────────────────────────────────────────────────────
 type BuildingRecord = {
@@ -142,78 +143,13 @@ export function MapScreen() {
         <span className="opacity-60">Phase 1 map</span>
       </div>
 
-      {/* ── Building bottom sheet ─────────────────────────────────────── */}
+      {/* ── Building bottom sheet (Phase 5: real activities + who-is-here) ─ */}
       {selected && (
-        <BuildingSheet
+        <ActivitiesSheet
           building={selected}
           onClose={() => setSelected(null)}
         />
       )}
-    </div>
-  );
-}
-
-// ── Bottom sheet ──────────────────────────────────────────────────────────
-function BuildingSheet({
-  building,
-  onClose,
-}: {
-  building: SelectedBuilding;
-  onClose: () => void;
-}) {
-  const displayName = building.name ?? 'Unnamed building';
-  const isUnnamed = !building.name;
-
-  return (
-    <div
-      className={cn(
-        'absolute bottom-0 left-0 right-0',
-        'hud-card rounded-t-3xl p-5',
-        'animate-in slide-in-from-bottom-4 duration-200',
-      )}
-    >
-      {/* Drag handle */}
-      <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4" />
-
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h3
-            className="text-lg font-bold text-white leading-tight"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            {displayName}
-          </h3>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] bg-white/10 text-white/70 px-2 py-0.5 rounded-full capitalize">
-              {building.category}
-            </span>
-            {building.gender_attr && (
-              <span className="text-[11px] bg-white/10 text-white/70 px-2 py-0.5 rounded-full capitalize">
-                {building.gender_attr}
-              </span>
-            )}
-            {building.status !== 'USER_CONFIRMED' && (
-              <span className="text-[11px] bg-amber-400/20 text-amber-400 px-2 py-0.5 rounded-full">
-                {building.status.replace(/_/g, ' ').toLowerCase()}
-              </span>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={onClose}
-          className="tap-target p-1.5 rounded-full bg-white/10 text-white/70 hover:bg-white/20"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Activity list placeholder */}
-      <div className="mt-4 rounded-xl bg-white/5 border border-white/10 p-4 text-center text-sm text-white/50">
-        {isUnnamed
-          ? 'This building hasn\'t been named yet.'
-          : 'Activities unlock in Phase 5 — study, eat, check in.'}
-      </div>
     </div>
   );
 }

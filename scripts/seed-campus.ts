@@ -435,6 +435,52 @@ async function main() {
     }
     console.log(`[seed] items seeded: ${itemsSeed.length} (food + service)`);
 
+    // ---------- Second demo student (for Phase 5 social flow testing) ----------
+    // Different department so "Someone from [dept]" is distinguishable.
+    const lawDept = await prisma.department.upsert({
+      where: { code: 'LAW' },
+      update: {},
+      create: { code: 'LAW', name: 'Law (demo)', faculty: 'Law' },
+    });
+    const student2Email = 'student2.demo@vuna-life.local';
+    const student2 = await prisma.user.upsert({
+      where: { email: student2Email },
+      update: {},
+      create: {
+        email: student2Email,
+        username: 'demo_law_student',
+        displayName: 'Tobi A.',
+        role: 'student',
+        departmentId: lawDept.id,
+        level: 300,
+        isVerifiedStudent: true,
+      },
+    });
+    // Seed student2's wallet with 1200 CC + hair Fresh + stats
+    await prisma.ledger.deleteMany({ where: { toUser: student2.id } });
+    await prisma.wallet.deleteMany({ where: { userId: student2.id } });
+    await prisma.ledger.create({
+      data: {
+        fromUser: null, toUser: student2.id, amount: 1500,
+        reason: 'weekly_allowance', metadata: JSON.stringify({ week: 'demo' }),
+      },
+    });
+    await prisma.wallet.create({
+      data: { userId: student2.id, balance: 1500, earnedToday: 0, earnedTodayDate: new Date() },
+    });
+    await prisma.hairState.upsert({
+      where: { userId: student2.id },
+      update: { stage: 'Fresh', lastCutAt: new Date() },
+      create: { userId: student2.id, stage: 'Fresh', lastCutAt: new Date() },
+    });
+    await prisma.stat.deleteMany({ where: { userId: student2.id } });
+    for (const p of ['Scholar','Social','Faith','Athlete','Creative','Leader']) {
+      await prisma.stat.create({ data: { userId: student2.id, path: p, xp: 0 } });
+    }
+    await prisma.discipline.deleteMany({ where: { userId: student2.id } });
+    await prisma.userGoal.deleteMany({ where: { userId: student2.id } });
+    console.log(`[seed] second demo student ${student2.email} seeded (Law, 300 level)`);
+
     // Phase 4 anomaly detection config keys
     await prisma.config.upsert({
       where: { key: 'anomaly_cap_breach_multiplier' },

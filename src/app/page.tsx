@@ -19,11 +19,14 @@ import { HomeScreenV2 } from '@/components/home/home-screen-v2';
 import { MapScreen } from '@/components/map/map-screen';
 import { WalletScreen } from '@/components/wallet/wallet-screen';
 import { CanteenScreen } from '@/components/canteen/canteen-screen';
+import { HellosScreen } from '@/components/social/hellos-screen';
+import { ChatsScreen } from '@/components/social/chats-screen';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 // ── Auth state types ──────────────────────────────────────────────────────
 export type SessionInfo = {
@@ -49,6 +52,7 @@ export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen'>('wallet');
+  const [peopleSubView, setPeopleSubView] = useState<'hellos' | 'chats'>('hellos');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   // Check session on mount
@@ -194,6 +198,8 @@ export default function Page() {
         setActiveTab(tab);
         // Reset wallet sub-view when leaving the wallet tab
         if (tab !== 'wallet') setWalletSubView('wallet');
+        // Reset people sub-view when leaving the people tab
+        if (tab !== 'people') setPeopleSubView('hellos');
       }}
       balance={walletBalance}
       online={user.isVerifiedStudent}
@@ -217,9 +223,23 @@ export default function Page() {
       )}
 
       {activeTab === 'people' && (
-        <div className="p-4 text-muted-foreground text-sm text-center pt-16">
-          People & presence — Phase 5
-        </div>
+        peopleSubView === 'chats' ? (
+          <ChatsScreen />
+        ) : (
+          <div className="space-y-0">
+            <HellosScreen />
+            <div className="px-4 pb-2">
+              <Button
+                variant="default"
+                size="sm"
+                className="w-full"
+                onClick={() => setPeopleSubView('chats')}
+              >
+                View chats →
+              </Button>
+            </div>
+          </div>
+        )
       )}
 
       {activeTab === 'profile' && (
