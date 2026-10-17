@@ -1,26 +1,33 @@
+/**
+ * page.tsx v2 — replaces the old tab-based layout entirely.
+ *
+ * Uses AppShell (fixed bottom nav) + per-tab screens.
+ * The map is a real first-class tab, not a future phase.
+ * Auth flow stays: sign-in → OTP → then AppShell.
+ *
+ * Adapted from the redesign pack's page-v2.tsx to match the existing
+ * SignInForm (onRequestSent prop) and OtpConfirmForm (no message prop,
+ * response.user not response.student) signatures — those auth component
+ * files must NOT change per the redesign prompt.
+ */
+
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useCallback, useEffect, useState } from 'react';
+import { AppShell, type AppTab } from '@/components/shell/app-shell';
+import { HomeScreenV2 } from '@/components/home/home-screen-v2';
+import { MapScreen } from '@/components/map/map-screen';
+import { AdminShell } from '@/components/admin/admin-shell';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
-import { StudentDashboard, type DashboardData } from '@/components/student/student-dashboard';
-import { HomeScreen } from '@/components/home/home-screen';
-import { TimetableView } from '@/components/timetable/timetable-view';
-import { AdminShell } from '@/components/admin/admin-shell';
-import { Building, ShieldAlert, LogOut, MapPin } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
+// ── Auth state types ──────────────────────────────────────────────────────
 export type SessionInfo = {
   id: string;
   email: string;
   emailDomain: string;
-  role: string; // 'student' | 'lecturer' | 'admin' | 'moderator'
+  role: string;
   username: string | null;
   displayName: string | null;
   departmentId: string | null;
@@ -32,26 +39,23 @@ type PageState =
   | { kind: 'loading' }
   | { kind: 'signed-out' }
   | { kind: 'requesting-otp'; email: string; demoOtp?: string; expiresInSec: number; message?: string }
-  | { kind: 'signed-in'; user: SessionInfo; dashboard: DashboardData | null };
+  | { kind: 'signed-in'; user: SessionInfo };
 
+// ── Page ─────────────────────────────────────────────────────────────────
 export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
-  const [demoBannerVisible, setDemoBannerVisible] = useState<boolean | null>(null);
+  const [activeTab, setActiveTab] = useState<AppTab>('home');
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
+  // Check session on mount
   const refresh = useCallback(() => {
     let cancelled = false;
     fetch('/api/student/me', { cache: 'no-store' })
       .then(async (res) => {
-        if (res.status === 401) {
-          if (!cancelled) setState({ kind: 'signed-out' });
-          return;
-        }
+        if (res.status === 401) { if (!cancelled) setState({ kind: 'signed-out' }); return; }
         const data = await res.json();
         if (cancelled) return;
-        if (!data.ok) {
-          setState({ kind: 'signed-out' });
-          return;
-        }
+        if (!data.ok) { setState({ kind: 'signed-out' }); return; }
         setState({
           kind: 'signed-in',
           user: {
@@ -65,257 +69,183 @@ export default function Page() {
             level: data.student.level,
             isVerifiedStudent: data.student.isVerifiedStudent,
           },
-          dashboard: {
-            department: data.student.department,
-            mondayTimetable: data.mondayTimetable ?? [],
-          },
         });
       })
-      .catch(() => {
-        if (!cancelled) setState({ kind: 'signed-out' });
-      });
-    return () => {
-      cancelled = true;
-    };
+      .catch(() => { if (!cancelled) setState({ kind: 'signed-out' }); });
+    return () => { cancelled = true; };
   }, []);
 
+  // Run on mount — useEffect, not useState(() => refresh()), so React 19's
+  // linter doesn't flag the setState-during-render pattern.
   useEffect(() => {
-    const cleanup = refresh();
-    return cleanup;
-  }, [refresh]);
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((r) => r.json())
-      .then((d) => setDemoBannerVisible(d.isDemoMode === true))
-      .catch(() => setDemoBannerVisible(null));
+    return refresh();
   }, []);
+
+  // ── Auth screens (outside AppShell) ───────────────────────────────────
+  if (state.kind === 'loading') {
+    return (
+      <div className="min-h-screen bg-primary flex flex-col items-center justify-center gap-4">
+        <p className="text-primary-foreground font-bold text-xl"
+           style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          VUNA Life
+        </p>
+        <Skeleton className="h-2 w-24 rounded-full bg-white/20" />
+      </div>
+    );
+  }
+
+  if (state.kind === 'signed-out') {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Brand header */}
+        <div className="bg-primary px-6 pt-16 pb-10">
+          <h1
+            className="text-3xl font-bold text-white"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            VUNA Life
+          </h1>
+          <p className="text-white/60 text-sm mt-1">Veritas University Abuja</p>
+        </div>
+        <div className="flex-1 p-6">
+          <SignInForm
+            // Adapted: existing SignInForm uses `onRequestSent` (single
+            // object arg). The redesign pack's page-v2.tsx used a different
+            // `onOtpRequested` signature; we use the existing component's
+            // signature here since auth files must not change.
+            onRequestSent={(r) =>
+              setState({
+                kind: 'requesting-otp',
+                email: r.email,
+                demoOtp: r.demoOtp,
+                expiresInSec: r.expiresInSec,
+                message: r.message,
+              })
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (state.kind === 'requesting-otp') {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="bg-primary px-6 pt-16 pb-10">
+          <h1
+            className="text-3xl font-bold text-white"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            Check your email
+          </h1>
+          <p className="text-white/60 text-sm mt-1">{state.email}</p>
+          {state.message && (
+            <p className="text-white/50 text-xs mt-2 italic">{state.message}</p>
+          )}
+        </div>
+        <div className="flex-1 p-6">
+          <OtpConfirmForm
+            email={state.email}
+            demoOtp={state.demoOtp}
+            expiresInSec={state.expiresInSec}
+            // Adapted: existing OtpConfirmForm response uses `r.user`
+            // (not `r.student`). The redesign pack's page-v2.tsx used
+            // `r.student` — we use the existing component's response shape.
+            onVerified={(r: VerifyResponse) => {
+              setState({
+                kind: 'signed-in',
+                user: {
+                  id: r.user.id,
+                  email: r.user.email,
+                  emailDomain: r.user.emailDomain,
+                  role: r.user.role,
+                  username: r.user.username,
+                  displayName: r.user.displayName,
+                  departmentId: r.user.departmentId,
+                  level: r.user.level,
+                  isVerifiedStudent: r.user.isVerifiedStudent,
+                },
+              });
+            }}
+            onBack={() => setState({ kind: 'signed-out' })}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main app (inside AppShell) ─────────────────────────────────────────
+  const { user } = state;
 
   const handleSignOut = async () => {
-    await fetch('/api/auth/signout', { method: 'POST' });
+    await fetch('/api/auth/signout', { method: 'POST' }).catch(() => {});
     setState({ kind: 'signed-out' });
+    setWalletBalance(null);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary text-primary-foreground grid place-items-center font-bold">
-              V
-            </div>
-            <div>
-              <div className="font-semibold text-sm sm:text-base leading-tight">VUNA Life</div>
-              <div className="text-[11px] text-muted-foreground leading-tight">
-                Veritas University Abuja &middot; Phase 1: foundation &amp; real data
-              </div>
-            </div>
-          </div>
-          {state.kind === 'signed-in' && (
-            <div className="flex items-center gap-2">
-              <Badge variant={state.user.role === 'admin' ? 'default' : 'secondary'}>
-                {state.user.role}
-              </Badge>
-              <span className="text-xs text-muted-foreground hidden sm:inline truncate max-w-[200px]">
-                {state.user.email}
-              </span>
-              <Button size="sm" variant="outline" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-1" /> Sign out
-              </Button>
-            </div>
-          )}
-        </div>
-      </header>
+    <AppShell
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      balance={walletBalance}
+      online={user.isVerifiedStudent}
+    >
+      {activeTab === 'map' && (
+        <MapScreen />
+      )}
 
-      {demoBannerVisible && (
-        <div className="bg-amber-50 border-b border-amber-200 dark:bg-amber-950/40 dark:border-amber-900">
-          <div className="container mx-auto px-4 py-2 flex items-start gap-2 text-xs text-amber-900 dark:text-amber-200">
-            <ShieldAlert className="h-4 w-4 mt-0.5 shrink-0" />
-            <div>
-              <strong className="font-semibold">DEMO MODE.</strong> Live Supabase credentials are
-              not configured, so the app is running on local SQLite with seeded campus data.
-              OTPs are visible on-screen (demo OTP is{' '}
-              <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900 rounded">123456</code>).
-              Verification is also{' '}
-              <strong className="font-semibold">closed</strong> unless an admin populates{' '}
-              <code className="px-1 py-0.5 bg-amber-100 dark:bg-amber-900 rounded">
-                allowed_email_domains
-              </code>{' '}
-              in config — but in DEMO MODE any email passes the check so you can see the flow.
-            </div>
-          </div>
+      {activeTab === 'home' && (
+        <div className="px-0">
+          <HomeScreenV2 onBalanceChange={setWalletBalance} />
         </div>
       )}
 
-      <main className="flex-1 container mx-auto px-4 py-6">
-        {state.kind === 'loading' && (
-          <div className="space-y-4 max-w-xl mx-auto">
-            <Skeleton className="h-10 w-1/3" />
-            <Skeleton className="h-40 w-full" />
-          </div>
-        )}
-
-        {state.kind === 'signed-out' && (
-          <div className="max-w-md mx-auto py-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="h-5 w-5" /> Sign in to VUNA Life
-                </CardTitle>
-                <CardDescription>
-                  Sign in with your school email. A one-time code will be sent to it.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <SignInForm
-                  onRequestSent={(r) =>
-                    setState({
-                      kind: 'requesting-otp',
-                      email: r.email,
-                      demoOtp: r.demoOtp,
-                      expiresInSec: r.expiresInSec,
-                      message: r.message,
-                    })
-                  }
-                />
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {state.kind === 'requesting-otp' && (
-          <div className="max-w-md mx-auto py-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Enter the code</CardTitle>
-                <CardDescription>
-                  We sent a 6-digit code to <strong>{state.email}</strong>.{' '}
-                  {state.message && <span className="block mt-1 text-xs">{state.message}</span>}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <OtpConfirmForm
-                  email={state.email}
-                  demoOtp={state.demoOtp}
-                  expiresInSec={state.expiresInSec}
-                  onVerified={(response: VerifyResponse) => {
-                    // Transition to signed-in IMMEDIATELY from the verify-otp
-                    // response — no second fetch needed. The response includes
-                    // the department + Monday timetable so the dashboard can
-                    // render with zero follow-up calls. This sidesteps the
-                    // cookie race entirely (especially through the preview
-                    // gateway, where the new cookie wasn't being seen by the
-                    // follow-up /api/student/me call).
-                    setState({
-                      kind: 'signed-in',
-                      user: {
-                        id: response.user.id,
-                        email: response.user.email,
-                        emailDomain: response.user.emailDomain,
-                        role: response.user.role,
-                        username: response.user.username,
-                        displayName: response.user.displayName,
-                        departmentId: response.user.departmentId,
-                        level: response.user.level,
-                        isVerifiedStudent: response.user.isVerifiedStudent,
-                      },
-                      dashboard: {
-                        department: response.department,
-                        mondayTimetable: response.mondayTimetable,
-                      },
-                    });
-                  }}
-                  onBack={() => setState({ kind: 'signed-out' })}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {state.kind === 'signed-in' && (
-          <SignedInView
-            user={state.user}
-            dashboard={state.dashboard}
-            onSignOut={handleSignOut}
-          />
-        )}
-      </main>
-
-      <footer className="mt-auto border-t bg-card/30">
-        <div className="container mx-auto px-4 py-4 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-          <span>
-            VUNA Life &middot; Phase 1 &middot;{' '}
-            <a
-              href="https://veritas.edu.ng"
-              target="_blank"
-              rel="noreferrer"
-              className="underline underline-offset-2 hover:text-foreground"
-            >
-              Veritas University Abuja
-            </a>
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" /> Map v1 approximate, traced from old satellite
-          </span>
+      {activeTab === 'wallet' && (
+        <div className="p-4 text-muted-foreground text-sm text-center pt-16">
+          Wallet & ledger — Phase 4
         </div>
-      </footer>
-    </div>
-  );
-}
+      )}
 
-function SignedInView({
-  user,
-  dashboard,
-  onSignOut,
-}: {
-  user: SessionInfo;
-  dashboard: DashboardData | null;
-  onSignOut: () => void;
-}) {
-  if (user.role === 'admin') {
-    return (
-      <Tabs defaultValue="home">
-        <TabsList className="mb-4 flex flex-wrap h-auto">
-          <TabsTrigger value="home">Home</TabsTrigger>
-          <TabsTrigger value="timetable">Timetable</TabsTrigger>
-          <TabsTrigger value="buildings">Buildings</TabsTrigger>
-          <TabsTrigger value="import">Import (CSV)</TabsTrigger>
-          <TabsTrigger value="config">Config</TabsTrigger>
-          <TabsTrigger value="audit">Audit log</TabsTrigger>
-        </TabsList>
-        <TabsContent value="home">
-          <HomeScreen user={user} initialData={dashboard} />
-        </TabsContent>
-        <TabsContent value="timetable">
-          <TimetableView />
-        </TabsContent>
-        <TabsContent value="buildings">
-          <AdminShell section="buildings" />
-        </TabsContent>
-        <TabsContent value="import">
-          <AdminShell section="import" />
-        </TabsContent>
-        <TabsContent value="config">
-          <AdminShell section="config" />
-        </TabsContent>
-        <TabsContent value="audit">
-          <AdminShell section="audit" />
-        </TabsContent>
-      </Tabs>
-    );
-  }
-  return (
-    <Tabs defaultValue="home">
-      <TabsList className="mb-4 flex flex-wrap h-auto">
-        <TabsTrigger value="home">Home</TabsTrigger>
-        <TabsTrigger value="timetable">Timetable</TabsTrigger>
-      </TabsList>
-      <TabsContent value="home">
-        <HomeScreen user={user} initialData={dashboard} />
-      </TabsContent>
-      <TabsContent value="timetable">
-        <TimetableView />
-      </TabsContent>
-    </Tabs>
+      {activeTab === 'people' && (
+        <div className="p-4 text-muted-foreground text-sm text-center pt-16">
+          People & presence — Phase 5
+        </div>
+      )}
+
+      {activeTab === 'profile' && (
+        <div className="p-4 space-y-4">
+          {/* Mini profile */}
+          <div className="pt-8 text-center space-y-1">
+            <div
+              className="text-2xl font-bold"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              {user.displayName ?? user.username ?? user.email}
+            </div>
+            <div className="text-sm text-muted-foreground">{user.email}</div>
+            {user.isVerifiedStudent && (
+              <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
+                Verified student
+              </span>
+            )}
+          </div>
+
+          {user.role === 'admin' && (
+            <div className="border-t pt-4">
+              <AdminShell user={user as any} />
+            </div>
+          )}
+
+          <div className="border-t pt-4">
+            <button
+              onClick={handleSignOut}
+              className="tap-target w-full text-center text-sm text-muted-foreground py-2"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </AppShell>
   );
 }
