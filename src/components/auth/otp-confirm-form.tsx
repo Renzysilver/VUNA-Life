@@ -9,11 +9,28 @@ import { Loader2, ArrowLeft, Copy } from 'lucide-react';
 export type VerifiedUser = {
   id: string;
   email: string;
+  emailDomain: string;
   role: string;
   username: string | null;
   displayName: string | null;
   departmentId: string | null;
   level: number | null;
+  isVerifiedStudent: boolean;
+};
+
+export type VerifyResponse = {
+  user: VerifiedUser;
+  department: { code: string; name: string; faculty: string | null } | null;
+  mondayTimetable: Array<{
+    id: string;
+    courseCode: string;
+    courseTitle: string;
+    weekday: number;
+    startTime: string;
+    endTime: string;
+    venue: { pin: string; name: string | null; status: string } | null;
+    lecturer: { username: string } | null;
+  }>;
 };
 
 export function OtpConfirmForm({
@@ -26,11 +43,11 @@ export function OtpConfirmForm({
   email: string;
   demoOtp?: string;
   expiresInSec: number;
-  // onVerified receives the user object straight from the verify-otp
-  // response. We pass it up so the parent can transition to signed-in state
-  // WITHOUT needing a second fetch (which races against the cookie being
-  // committed to the browser jar, especially through the preview gateway).
-  onVerified: (user: VerifiedUser) => void;
+  // onVerified receives the full verify-otp response (user + department +
+  // Monday timetable) so the parent can render the dashboard immediately
+  // without a second fetch that races against the cookie being committed
+  // to the browser jar (a real problem through the preview gateway).
+  onVerified: (response: VerifyResponse) => void;
   onBack: () => void;
 }) {
   const [code, setCode] = useState('');
@@ -61,7 +78,11 @@ export function OtpConfirmForm({
         setError(data.message ?? 'Verification failed.');
         return;
       }
-      onVerified(data.user as VerifiedUser);
+      onVerified({
+        user: data.user,
+        department: data.department ?? null,
+        mondayTimetable: data.mondayTimetable ?? [],
+      });
     } catch {
       setError('Network error. Please try again.');
     } finally {

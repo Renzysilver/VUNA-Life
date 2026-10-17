@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SignInForm } from '@/components/auth/sign-in-form';
-import { OtpConfirmForm } from '@/components/auth/otp-confirm-form';
-import { StudentDashboard } from '@/components/student/student-dashboard';
+import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
+import { StudentDashboard, type DashboardData } from '@/components/student/student-dashboard';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { Building, ShieldAlert, LogOut, MapPin } from 'lucide-react';
 
@@ -30,7 +30,7 @@ type PageState =
   | { kind: 'loading' }
   | { kind: 'signed-out' }
   | { kind: 'requesting-otp'; email: string; demoOtp?: string; expiresInSec: number; message?: string }
-  | { kind: 'signed-in'; user: SessionInfo };
+  | { kind: 'signed-in'; user: SessionInfo; dashboard: DashboardData | null };
 
 export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
@@ -62,6 +62,10 @@ export default function Page() {
             departmentId: data.student.departmentId,
             level: data.student.level,
             isVerifiedStudent: data.student.isVerifiedStudent,
+          },
+          dashboard: {
+            department: data.student.department,
+            mondayTimetable: data.mondayTimetable ?? [],
           },
         });
       })
@@ -192,26 +196,30 @@ export default function Page() {
                   email={state.email}
                   demoOtp={state.demoOtp}
                   expiresInSec={state.expiresInSec}
-                  onVerified={(user) => {
+                  onVerified={(response: VerifyResponse) => {
                     // Transition to signed-in IMMEDIATELY from the verify-otp
-                    // response — do not wait for a second fetch of /api/student/me,
-                    // because that races against the cookie being committed
-                    // to the browser's cookie jar (a real problem through the
-                    // preview gateway). The StudentDashboard does its own fetch
-                    // of /api/student/me, which by then has the cookie ready.
+                    // response — no second fetch needed. The response includes
+                    // the department + Monday timetable so the dashboard can
+                    // render with zero follow-up calls. This sidesteps the
+                    // cookie race entirely (especially through the preview
+                    // gateway, where the new cookie wasn't being seen by the
+                    // follow-up /api/student/me call).
                     setState({
                       kind: 'signed-in',
                       user: {
-                        id: user.id,
-                        email: user.email,
-                        emailDomain: user.email.split('@')[1]?.toLowerCase() ?? '',
-                        role: user.role,
-                        username: user.username,
-                        displayName: user.displayName,
-                        departmentId: user.departmentId,
-                        level: user.level,
-                        // isVerifiedStudent is true here — they just verified.
-                        isVerifiedStudent: true,
+                        id: response.user.id,
+                        email: response.user.email,
+                        emailDomain: response.user.emailDomain,
+                        role: response.user.role,
+                        username: response.user.username,
+                        displayName: response.user.displayName,
+                        departmentId: response.user.departmentId,
+                        level: response.user.level,
+                        isVerifiedStudent: response.user.isVerifiedStudent,
+                      },
+                      dashboard: {
+                        department: response.department,
+                        mondayTimetable: response.mondayTimetable,
                       },
                     });
                   }}
@@ -223,7 +231,11 @@ export default function Page() {
         )}
 
         {state.kind === 'signed-in' && (
-          <SignedInView user={state.user} onSignOut={handleSignOut} />
+          <SignedInView
+            user={state.user}
+            dashboard={state.dashboard}
+            onSignOut={handleSignOut}
+          />
         )}
       </main>
 
@@ -249,7 +261,15 @@ export default function Page() {
   );
 }
 
-function SignedInView({ user, onSignOut }: { user: SessionInfo; onSignOut: () => void }) {
+function SignedInView({
+  user,
+  dashboard,
+  onSignOut,
+}: {
+  user: SessionInfo;
+  dashboard: DashboardData | null;
+  onSignOut: () => void;
+}) {
   if (user.role === 'admin') {
     return (
       <Tabs defaultValue="student">
@@ -261,7 +281,7 @@ function SignedInView({ user, onSignOut }: { user: SessionInfo; onSignOut: () =>
           <TabsTrigger value="audit">Audit log</TabsTrigger>
         </TabsList>
         <TabsContent value="student">
-          <StudentDashboard user={user} />
+          <StudentDashboard user={user} initialData={dashboard} />
         </TabsContent>
         <TabsContent value="buildings">
           <AdminShell section="buildings" />
@@ -278,5 +298,5 @@ function SignedInView({ user, onSignOut }: { user: SessionInfo; onSignOut: () =>
       </Tabs>
     );
   }
-  return <StudentDashboard user={user} />;
+  return <StudentDashboard user={user} initialData={dashboard} />;
 }
