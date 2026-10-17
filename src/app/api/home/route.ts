@@ -280,6 +280,7 @@ export async function GET(req: Request) {
         : null,
       level: user.level,
       isVerifiedStudent: user.isVerifiedStudent,
+      avatarPath: user.avatarPath,
     },
     dailyLoop: loopWithPosition,
     nextObligation,

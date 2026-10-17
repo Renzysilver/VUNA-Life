@@ -28,7 +28,7 @@ export async function listCanteenItems(): Promise<CanteenItem[]> {
     id: r.id,
     code: r.code,
     name: r.name,
-    category: r.category,
+    category: r.category ?? 'other',
     basePrice: r.basePrice,
     metadata: safeJson(r.metadata),
   }));

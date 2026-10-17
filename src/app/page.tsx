@@ -19,6 +19,7 @@ import { HomeScreenV2 } from '@/components/home/home-screen-v2';
 import { MapScreen } from '@/components/map/map-screen';
 import { WalletScreen } from '@/components/wallet/wallet-screen';
 import { CanteenScreen } from '@/components/canteen/canteen-screen';
+import { HustleScreen } from '@/components/hustle/hustle-screen';
 import { HellosScreen } from '@/components/social/hellos-screen';
 import { ChatsScreen } from '@/components/social/chats-screen';
 import { FeedbackButton } from '@/components/social/feedback-button';
@@ -29,6 +30,7 @@ import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // ── Auth state types ──────────────────────────────────────────────────────
 export type SessionInfo = {
@@ -55,7 +57,7 @@ type PageState =
 export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [activeTab, setActiveTab] = useState<AppTab>('home');
-  const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen'>('wallet');
+  const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen' | 'hustle'>('wallet');
   const [peopleSubView, setPeopleSubView] = useState<'hellos' | 'chats'>('hellos');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [showGate, setShowGate] = useState(false);
@@ -260,8 +262,13 @@ export default function Page() {
       {activeTab === 'wallet' && (
         walletSubView === 'canteen' ? (
           <CanteenScreen />
+        ) : walletSubView === 'hustle' ? (
+          <HustleScreen onBalanceChange={setWalletBalance} />
         ) : (
-          <WalletScreen onGoToCanteen={() => setWalletSubView('canteen')} />
+          <WalletScreen
+            onGoToCanteen={() => setWalletSubView('canteen')}
+            onGoToHustle={() => setWalletSubView('hustle')}
+          />
         )
       )}
 
@@ -335,7 +342,18 @@ export default function Page() {
               >
                 Admin tools
               </h2>
-              <AdminShell user={user as any} />
+              <Tabs defaultValue="buildings">
+                <TabsList className="mb-3 flex flex-wrap h-auto">
+                  <TabsTrigger value="buildings">Buildings</TabsTrigger>
+                  <TabsTrigger value="import">Import (CSV)</TabsTrigger>
+                  <TabsTrigger value="config">Config</TabsTrigger>
+                  <TabsTrigger value="audit">Audit log</TabsTrigger>
+                </TabsList>
+                <TabsContent value="buildings"><AdminShell section="buildings" /></TabsContent>
+                <TabsContent value="import"><AdminShell section="import" /></TabsContent>
+                <TabsContent value="config"><AdminShell section="config" /></TabsContent>
+                <TabsContent value="audit"><AdminShell section="audit" /></TabsContent>
+              </Tabs>
             </div>
           )}
 

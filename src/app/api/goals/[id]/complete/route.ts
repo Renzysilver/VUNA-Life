@@ -33,5 +33,6 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
     return NextResponse.json({ ok: false, message: result.reason ?? 'Failed' }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, ...result });
+  const { ok: _ok, ...rest } = result;
+  return NextResponse.json({ ok: true, ...rest });
 }

@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DaySummaryCard } from '@/components/day-summary/day-summary-card';
+import { OnboardingChecklist } from '@/components/onboarding/onboarding-checklist';
 import {
   Sun, Moon, Scissors, Church, BookOpen, Coffee,
   Store, Lock, Target, Bell, AlertTriangle,
@@ -45,7 +46,7 @@ type HomeResponse = {
   greeting: string;
   dayName: string;
   timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
-  user: { displayName: string | null; username: string | null; department: { name: string } | null; level: number | null };
+  user: { displayName: string | null; username: string | null; department: { name: string } | null; level: number | null; isVerifiedStudent: boolean; avatarPath: string | null };
   nextObligation: NextObligation;
   classAlert: { minutesUntilStart: number; class: { courseCode: string; startTime: string; venue: { name: string | null } | null } | null } | null;
   goals: Goal[];
@@ -167,6 +168,13 @@ export function HomeScreenV2({ onBalanceChange }: Props) {
 
   return (
     <div className="flex flex-col gap-3 pb-4">
+
+      {/* ══ 0. ONBOARDING CHECKLIST (shown until complete) ════════════ */}
+      <OnboardingChecklist
+        username={data.user.username}
+        isVerified={data.user.isVerifiedStudent}
+        avatarPath={data.user.avatarPath}
+      />
 
       {/* ══ 1. HERO ════════════════════════════════════════════════════ */}
       <section

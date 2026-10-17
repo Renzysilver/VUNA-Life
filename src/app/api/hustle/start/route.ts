@@ -23,5 +23,6 @@ export async function POST(req: Request) {
     ctx: { actorId: user.id, ...getRequestContext(req) },
   });
   if (!r.ok) return NextResponse.json({ ok: false, message: r.message, reason: r.reason }, { status: 400 });
-  return NextResponse.json({ ok: true, ...r });
+  const { ok: _ok, ...rest } = r;
+  return NextResponse.json({ ok: true, ...rest });
 }

@@ -26,7 +26,7 @@ export type PresenceState = 'solid' | 'likely' | 'event' | 'ghost';
 
 export type PresenceRow = {
   userId: string;
-  buildingId: string;
+  buildingId: string | null;
   state: PresenceState;
   since: Date;
   expiresAt: Date;
@@ -55,6 +55,7 @@ export async function setPresence(args: {
   buildingId: string;
   state?: PresenceState;
 }): Promise<void> {
+  if (!args.buildingId) return; // buildingId must be a valid string
   const now = new Date();
   const expiresAt = new Date(now.getTime() + PRESENCE_TTL_MIN * 60 * 1000);
   await db.presence.upsert({
@@ -100,6 +101,7 @@ export async function listPresenceCountsPerBuilding(): Promise<Array<{
   });
   const byBuilding = new Map<string, number>();
   for (const r of rows) {
+    if (!r.buildingId) continue;
     byBuilding.set(r.buildingId, (byBuilding.get(r.buildingId) ?? 0) + 1);
   }
   return Array.from(byBuilding.entries()).map(([buildingId, count]) => ({ buildingId, count }));

@@ -84,7 +84,11 @@ export async function computeGateOutcome(args: {
   });
   if (existing) {
     // Already arrived — return the existing outcome with dialogue.
-    const dialogue = await buildDialogue(existing.officerPersonality, existing.searchOutcome, existing.dressCodeResult);
+    const dialogue = await buildDialogue(
+      existing.officerPersonality as OfficerPersonality,
+      existing.searchOutcome as SearchOutcome,
+      existing.dressCodeResult as DressCodeResult,
+    );
     return {
       arrivalId: existing.id,
       officerPersonality: existing.officerPersonality as OfficerPersonality,
@@ -98,7 +102,7 @@ export async function computeGateOutcome(args: {
 
   // ── Compute the outcome (server-side, deterministic per userId + date).
   const seed = hashStr(`${args.userId}:${todayStr}`);
-  const officer = PERSONALITIES[seed % PERSONALITIES.length];
+  const officer: OfficerPersonality = PERSONALITIES[seed % PERSONALITIES.length];
 
   // Search probability from config.
   const searchChanceRaw = await getConfig(`gate_search_chance_${officer}`);
@@ -113,10 +117,8 @@ export async function computeGateOutcome(args: {
   const dressCodeResult: DressCodeResult = hair.stage === 'Violation' ? 'violation' : 'ok';
 
   // Determine search outcome.
-  let searchOutcome: SearchOutcome;
-  if (!searched) {
-    searchOutcome = 'cleared';
-  } else {
+  let searchOutcome: SearchOutcome = 'cleared';
+  if (searched) {
     // In DEMO_MODE, we don't have real contraband in the inventory
     // (no banned items configured yet). For now, contraband chance
     // is 0 (the student has nothing illegal). When the school rulebook
@@ -139,7 +141,7 @@ export async function computeGateOutcome(args: {
       },
     });
     disciplineApplied = 'Form';
-  } else if (searchOutcome === 'contraband_found') {
+  } else if ((searchOutcome as SearchOutcome) === 'contraband_found') {
     // Contraband → Warning tier.
     await db.discipline.create({
       data: {

@@ -17,8 +17,8 @@ export async function writeAudit(
   action: string,
   tableName: string,
   rowId: string | null | undefined,
-  before?: Prisma.JsonValue | null,
-  after?: Prisma.JsonValue | null,
+  before?: any,
+  after?: any,
 ): Promise<void> {
   try {
     await db.auditLog.create({

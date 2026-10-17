@@ -58,13 +58,20 @@ export async function submitFeedback(args: {
 }
 
 export async function listFeedback(limit = 50) {
-  return db.feedback.findMany({
+  const rows = await db.feedback.findMany({
     orderBy: { createdAt: 'desc' },
     take: Math.min(limit, 200),
-    include: {
-      user: {
-        select: { id: true, username: true, displayName: true, email: true, department: { select: { code: true, name: true } } },
-      },
-    },
   });
+  // Manually join user data (Feedback model doesn't have a Prisma relation
+  // to User, so we fetch separately).
+  const userIds = Array.from(new Set(rows.map((r) => r.userId)));
+  const users = await db.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, username: true, displayName: true, email: true, department: { select: { code: true, name: true } } },
+  });
+  const userMap = new Map(users.map((u) => [u.id, u]));
+  return rows.map((r) => ({
+    ...r,
+    user: userMap.get(r.userId) ?? null,
+  }));
 }

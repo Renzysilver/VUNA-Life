@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Snowflake, ArrowDownLeft, ArrowUpRight, RefreshCw, ShoppingCart } from 'lucide-react';
+import { Snowflake, ArrowDownLeft, ArrowUpRight, RefreshCw, ShoppingCart, Store } from 'lucide-react';
 
 type WalletView = {
   userId: string;
@@ -47,15 +47,21 @@ type WalletResponse = {
   ledger: LedgerRow[];
 };
 
-export function WalletScreen({ onGoToCanteen }: { onGoToCanteen?: () => void }) {
+export function WalletScreen({ onGoToCanteen, onGoToHustle }: { onGoToCanteen?: () => void; onGoToHustle?: () => void }) {
   const { toast } = useToast();
   const [data, setData] = useState<WalletResponse | null>(null);
+  const [hustleOpen, setHustleOpen] = useState(false);
 
   const reload = useCallback(() => {
     let cancelled = false;
     fetch('/api/wallet', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d: WalletResponse) => { if (!cancelled && d.ok) setData(d); })
+      .catch(() => {});
+    // Also check if the hustle window is open (18:00–22:00 server time).
+    fetch('/api/hustle/status', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled && d.ok && d.status?.open) setHustleOpen(true); })
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -116,6 +122,11 @@ export function WalletScreen({ onGoToCanteen }: { onGoToCanteen?: () => void }) 
         <Button variant="default" size="sm" className="flex-1" onClick={onGoToCanteen}>
           <ShoppingCart className="h-4 w-4 mr-1.5" /> Buy food
         </Button>
+        {hustleOpen && (
+          <Button variant="default" size="sm" className="flex-1 bg-accent text-accent-foreground" onClick={onGoToHustle}>
+            <Store className="h-4 w-4 mr-1.5" /> Evening hustle
+          </Button>
+        )}
         <Button variant="outline" size="sm" onClick={() => reload()}>
           <RefreshCw className="h-4 w-4" />
         </Button>

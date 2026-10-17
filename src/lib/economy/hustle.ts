@@ -98,7 +98,7 @@ export async function getHustleStatus(userId: string) {
 
 export type HustleResult =
   | { ok: true; sold: boolean; revenue: number; netProfit: number; newBalance: number }
-  | { ok: false; reason: 'window_closed' | 'max_attempts' | 'insufficient_balance' | 'account_frozen' | 'invalid_price' | 'invalid_item'; message: string };
+  | { ok: false; reason: 'window_closed' | 'max_attempts' | 'insufficient_balance' | 'account_frozen' | 'invalid_price' | 'invalid_item' | 'unknown'; message: string };
 
 /**
  * Start a hustle attempt.
