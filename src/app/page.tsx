@@ -21,8 +21,10 @@ import { WalletScreen } from '@/components/wallet/wallet-screen';
 import { CanteenScreen } from '@/components/canteen/canteen-screen';
 import { HellosScreen } from '@/components/social/hellos-screen';
 import { ChatsScreen } from '@/components/social/chats-screen';
+import { FeedbackButton } from '@/components/social/feedback-button';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
+import { GateArrivalScene } from '@/components/gate/gate-arrival-scene';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +41,8 @@ export type SessionInfo = {
   departmentId: string | null;
   level: number | null;
   isVerifiedStudent: boolean;
+  isBeta: boolean;
+  avatarPath: string | null;
 };
 
 type PageState =
@@ -54,6 +58,7 @@ export default function Page() {
   const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen'>('wallet');
   const [peopleSubView, setPeopleSubView] = useState<'hellos' | 'chats'>('hellos');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [showGate, setShowGate] = useState(false);
 
   // Check session on mount
   const refresh = useCallback(() => {
@@ -76,8 +81,26 @@ export default function Page() {
             departmentId: data.student.departmentId,
             level: data.student.level,
             isVerifiedStudent: data.student.isVerifiedStudent,
+            isBeta: data.student.isBeta ?? false,
+            avatarPath: data.student.avatarPath ?? null,
           },
         });
+        // Check if the user needs to arrive at the gate today.
+        // Only for students (not admins/lecturers in admin mode).
+        if (data.student.role === 'student' || data.student.role === 'admin') {
+          fetch('/api/gate/arrive', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ action: 'compute' }),
+          })
+            .then((r) => r.json())
+            .then((d) => {
+              if (d.ok && !d.alreadyArrived) {
+                setShowGate(true);
+              }
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => { if (!cancelled) setState({ kind: 'signed-out' }); });
     return () => { cancelled = true; };
@@ -172,14 +195,34 @@ export default function Page() {
                   departmentId: r.user.departmentId,
                   level: r.user.level,
                   isVerifiedStudent: r.user.isVerifiedStudent,
+                  isBeta: (r as any).user.isBeta ?? false,
+                  avatarPath: (r as any).user.avatarPath ?? null,
                 },
               });
+              // Check gate arrival for the newly-signed-in user.
+              fetch('/api/gate/arrive', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ action: 'compute' }),
+              })
+                .then((r) => r.json())
+                .then((d) => {
+                  if (d.ok && !d.alreadyArrived) {
+                    setShowGate(true);
+                  }
+                })
+                .catch(() => {});
             }}
             onBack={() => setState({ kind: 'signed-out' })}
           />
         </div>
       </div>
     );
+  }
+
+  // ── Gate arrival scene (Phase 6) ────────────────────────────────────────
+  if (showGate) {
+    return <GateArrivalScene onDone={() => setShowGate(false)} />;
   }
 
   // ── Main app (inside AppShell) ─────────────────────────────────────────
@@ -253,11 +296,23 @@ export default function Page() {
               {user.displayName ?? user.username ?? user.email}
             </div>
             <div className="text-sm text-muted-foreground">{user.email}</div>
-            {user.isVerifiedStudent && (
-              <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
-                Verified student
-              </span>
-            )}
+            <div className="flex items-center justify-center gap-1.5 pt-1 flex-wrap">
+              {user.isVerifiedStudent && (
+                <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
+                  Verified student
+                </span>
+              )}
+              {user.isBeta && (
+                <span className="inline-block text-[11px] bg-accent/15 text-accent-foreground border border-accent/30 px-3 py-0.5 rounded-full font-medium">
+                  ⭐ Beta
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Feedback button — always visible */}
+          <div className="border-t pt-4">
+            <FeedbackButton />
           </div>
 
           {(user.role === 'lecturer' || user.role === 'admin') && (

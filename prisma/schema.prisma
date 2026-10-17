@@ -34,6 +34,8 @@ model User {
   level             Int?      // 100..800
   isVerifiedStudent Boolean   @default(false)
   isMinor           Boolean   @default(false)
+  isBeta            Boolean   @default(false) // Phase 6: beta cohort flag
+  avatarPath        String?   // Phase 6: onboarding checklist — which avatar style
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -506,4 +508,48 @@ model AuditLog {
 
   @@index([actorId, createdAt])
   @@index([tableName, rowId])
+}
+
+// ---------- Phase 6: gate arrivals ----------
+model GateArrival {
+  id                  String   @id @default(cuid())
+  userId              String
+  arrivalDate         DateTime
+  officerPersonality  String   // strict|relaxed|suspicious|friendly
+  searchOutcome       String   // searched|cleared|contraband_found
+  dressCodeResult     String   // ok|violation
+  disciplineApplied   String?
+  declaredItems       String   @default("[]") // JSON string
+  skipped             Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  @@unique([userId, arrivalDate])
+}
+
+// ---------- Phase 6: hustle attempts ----------
+model HustleAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  itemCode      String
+  itemName      String
+  purchaseCost  Int
+  salePrice     Int
+  sold          Boolean  @default(false)
+  revenue       Int      @default(0)
+  attemptDate   DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([userId, attemptDate])
+}
+
+// ---------- Phase 6: feedback ----------
+// The ONLY place free text is allowed (max 140 chars, rate-limited).
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  category  String   // bug|feature_request|suggestion|complaint|praise
+  body      String?  // max 140 chars
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

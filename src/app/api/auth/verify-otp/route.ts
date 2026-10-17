@@ -74,6 +74,8 @@ export async function POST(req: Request) {
       departmentId: user.departmentId,
       level: user.level,
       isVerifiedStudent: user.isVerifiedStudent,
+      isBeta: user.isBeta,
+      avatarPath: user.avatarPath,
     },
     department: user.department
       ? {

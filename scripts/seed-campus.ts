@@ -227,6 +227,8 @@ async function main() {
         departmentId: dept.id,
         level: 200,
         isVerifiedStudent: true,
+        isBeta: true,
+        avatarPath: 'scholar',
       },
     });
 
@@ -496,6 +498,38 @@ async function main() {
       where: { key: 'anomaly_max_hustle_sale' },
       update: { value: '500' },
       create: { key: 'anomaly_max_hustle_sale', value: '500', description: 'No single hustle_sale entry may exceed this.' },
+    });
+
+    // Phase 6 config: gate + hustle + feedback
+    await prisma.config.upsert({
+      where: { key: 'hustle_window_start' },
+      update: { value: '"18:00"' },
+      create: { key: 'hustle_window_start', value: '"18:00"', description: 'Evening hustle window start (server time).' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'hustle_window_end' },
+      update: { value: '"22:00"' },
+      create: { key: 'hustle_window_end', value: '"22:00"', description: 'Evening hustle window end (server time).' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'hustle_max_attempts_per_evening' },
+      update: { value: '3' },
+      create: { key: 'hustle_max_attempts_per_evening', value: '3', description: 'Max hustle attempts per evening window.' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'hustle_price_variance_pct' },
+      update: { value: '20' },
+      create: { key: 'hustle_price_variance_pct', value: '20', description: 'Allowed variance ±N% from the suggested price.' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'feedback_rate_limit_hours' },
+      update: { value: '24' },
+      create: { key: 'feedback_rate_limit_hours', value: '24', description: 'Hours between feedback submissions per user.' },
+    });
+    await prisma.config.upsert({
+      where: { key: 'feedback_max_chars' },
+      update: { value: '140' },
+      create: { key: 'feedback_max_chars', value: '140', description: 'Max characters in feedback body.' },
     });
 
     console.log(`[seed] demo user ${student.email} + Phase 4 sample data seeded`);
