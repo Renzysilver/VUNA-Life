@@ -253,32 +253,158 @@ async function main() {
 
     const monday = 1; // 0=Sun, 1=Mon
     const blocksBuilding = await prisma.building.findUnique({ where: { pin: '2' } }); // Block A
+    const libraryBuilding = await prisma.building.findUnique({ where: { pin: '8' } });
+    const canteenBuilding = await prisma.building.findUnique({ where: { pin: '6' } }); // Multipurpose Hall (AC Canteen near it)
+
     if (blocksBuilding) {
+      // Clean previous demo timetable entries first so re-seeding is idempotent
+      await prisma.timetable.deleteMany({ where: { departmentId: dept.id, level: 200 } });
+
       await prisma.timetable.create({
         data: {
-          courseId: course.id,
-          departmentId: dept.id,
-          level: 200,
-          weekday: monday,
-          startTime: '08:00',
-          endTime: '10:00',
+          courseId: course.id, departmentId: dept.id, level: 200,
+          weekday: monday, startTime: '08:00', endTime: '10:00',
           venueId: blocksBuilding.id,
         },
       });
       await prisma.timetable.create({
         data: {
-          courseId: course.id,
-          departmentId: dept.id,
-          level: 200,
-          weekday: monday,
-          startTime: '14:00',
-          endTime: '16:00',
+          courseId: course.id, departmentId: dept.id, level: 200,
+          weekday: monday, startTime: '14:00', endTime: '16:00',
+          venueId: blocksBuilding.id,
+        },
+      });
+      // Wednesday and Friday classes too, so the timetable week grid has more shape
+      const wed = 3, fri = 5;
+      await prisma.timetable.create({
+        data: {
+          courseId: course.id, departmentId: dept.id, level: 200,
+          weekday: wed, startTime: '10:00', endTime: '12:00',
+          venueId: libraryBuilding?.id ?? blocksBuilding.id,
+        },
+      });
+      await prisma.timetable.create({
+        data: {
+          courseId: course.id, departmentId: dept.id, level: 200,
+          weekday: fri, startTime: '08:00', endTime: '09:00',
           venueId: blocksBuilding.id,
         },
       });
     }
 
-    console.log(`[seed] demo user ${student.email} + Monday timetable seeded`);
+    // ---------- Daily goal templates ----------
+    // The goals engine picks 3 of these per student per day. Each goal is
+    // tagged with a life_path (Scholar, Social, Faith, Athlete, Creative, Leader).
+    // All templates here are daily cadence. Real school rulebook values feed in
+    // later — for now these are proposals marked in the description.
+    await prisma.goal.deleteMany({});
+    const goalTemplates: Array<{ title: string; path: string; template: any }> = [
+      { title: 'Attend your first class of the day', path: 'Scholar', template: { reward: 30 } },
+      { title: 'Spend 30 minutes in the Library', path: 'Scholar', template: { reward: 25, venue: 'Library' } },
+      { title: 'Eat lunch at the canteen', path: 'Social', template: { reward: 15, venue: 'Multipurpose Hall' } },
+      { title: 'Say hello to one new person', path: 'Social', template: { reward: 20 } },
+      { title: 'Attend 12:10 mass', path: 'Faith', template: { reward: 50, startTime: '12:10' } },
+      { title: 'Take a haircut before inspection', path: 'Athlete', template: { reward: 0, avoids: 'overdue_fine' } },
+      { title: 'Wrap up the hustle before 22:00', path: 'Leader', template: { reward: 40 } },
+      { title: 'Trade at the hostel front 18:00–22:00', path: 'Leader', template: { reward: 60, startTime: '18:00' } },
+    ];
+    for (const g of goalTemplates) {
+      await prisma.goal.create({
+        data: {
+          title: g.title,
+          cadence: 'daily',
+          path: g.path,
+          template: JSON.stringify(g.template),
+          isActive: true,
+        },
+      });
+    }
+    console.log(`[seed] goal templates inserted: ${goalTemplates.length}`);
+
+    // ---------- Demo announcements (for the Home strip) ----------
+    await prisma.announcement.deleteMany({});
+    const announcements: Array<{ title: string; body: string; category: string; pinned?: boolean }> = [
+      {
+        title: 'Faculty mass — Monday 12:10 at the Chapel',
+        body: 'Compulsory for NAS. 500 CC fine + warning meter if you miss it.',
+        category: 'spiritual',
+        pinned: true,
+      },
+      {
+        title: 'Hair inspection at the gate this week',
+        body: 'Security officers are running checks. Get a haircut at the on-campus barber (150–250 CC).',
+        category: 'safety',
+      },
+      {
+        title: 'Power cut yesterday — water restored by 6pm',
+        body: 'If your phone died, the library has charging points during opening hours.',
+        category: 'general',
+      },
+      {
+        title: 'Hustle window opens 18:00 at the hostel fronts',
+        body: 'Vendors hand out stock on consignment. Stop by 22:00 — the hostels lock at 22:00.',
+        category: 'social',
+      },
+      {
+        title: 'CSC201 assignment due Friday',
+        body: 'Submit at the bookshop (pin 35). Long queues expected on short notice.',
+        category: 'academic',
+      },
+    ];
+    for (const a of announcements) {
+      await prisma.announcement.create({
+        data: {
+          title: a.title,
+          body: a.body,
+          category: a.category,
+          isPinned: a.pinned ?? false,
+          startsAt: new Date(),
+        },
+      });
+    }
+    console.log(`[seed] announcements inserted: ${announcements.length}`);
+
+    // ---------- Demo student's wallet (1,200 CC weekly allowance via ledger) ----------
+    // HARD RULE: balance is recomputed from ledger. We insert ONE ledger entry
+    // (weekly_allowance) and the wallet adapter will sum it on read.
+    await prisma.ledger.deleteMany({ where: { toUser: student.id } });
+    await prisma.wallet.deleteMany({ where: { userId: student.id } });
+    await prisma.ledger.create({
+      data: {
+        fromUser: null,
+        toUser: student.id,
+        amount: 1200,
+        reason: 'weekly_allowance',
+        metadata: JSON.stringify({ week: 'demo', note: 'Pocket money from home (demo)' }),
+      },
+    });
+    // Create the wallet row so reads don't have to lazy-create.
+    // The wallet adapter will recompute balance from ledger on read.
+    await prisma.wallet.create({
+      data: { userId: student.id, balance: 1200, earnedToday: 0, earnedTodayDate: new Date() },
+    });
+    console.log(`[seed] demo wallet seeded: 1,200 CC weekly allowance via ledger`);
+
+    // ---------- Demo student's hair_state (Fresh) ----------
+    await prisma.hairState.deleteMany({ where: { userId: student.id } });
+    await prisma.hairState.create({
+      data: { userId: student.id, stage: 'Fresh', lastCutAt: new Date() },
+    });
+    console.log(`[seed] demo hair_state seeded: Fresh`);
+
+    // ---------- Stats: zero out any previous stats rows for the demo student ----------
+    await prisma.stat.deleteMany({ where: { userId: student.id } });
+    for (const p of ['Scholar','Social','Faith','Athlete','Creative','Leader']) {
+      await prisma.stat.create({
+        data: { userId: student.id, path: p, xp: 0 },
+      });
+    }
+    console.log(`[seed] demo stats seeded: all six paths at 0 XP`);
+
+    // ---------- Discipline: clean (no entries) ----------
+    await prisma.discipline.deleteMany({ where: { userId: student.id } });
+
+    console.log(`[seed] demo user ${student.email} + Phase 2 sample data seeded`);
   } else {
     console.log('[seed] skipping DEMO sample data (set DEMO_SEED_SAMPLE_DATA=1 to enable)');
   }

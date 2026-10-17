@@ -11,6 +11,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { StudentDashboard, type DashboardData } from '@/components/student/student-dashboard';
+import { HomeScreen } from '@/components/home/home-screen';
+import { TimetableView } from '@/components/timetable/timetable-view';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { Building, ShieldAlert, LogOut, MapPin } from 'lucide-react';
 
@@ -272,16 +274,20 @@ function SignedInView({
 }) {
   if (user.role === 'admin') {
     return (
-      <Tabs defaultValue="student">
+      <Tabs defaultValue="home">
         <TabsList className="mb-4 flex flex-wrap h-auto">
-          <TabsTrigger value="student">Student view</TabsTrigger>
+          <TabsTrigger value="home">Home</TabsTrigger>
+          <TabsTrigger value="timetable">Timetable</TabsTrigger>
           <TabsTrigger value="buildings">Buildings</TabsTrigger>
           <TabsTrigger value="import">Import (CSV)</TabsTrigger>
           <TabsTrigger value="config">Config</TabsTrigger>
           <TabsTrigger value="audit">Audit log</TabsTrigger>
         </TabsList>
-        <TabsContent value="student">
-          <StudentDashboard user={user} initialData={dashboard} />
+        <TabsContent value="home">
+          <HomeScreen user={user} initialData={dashboard} />
+        </TabsContent>
+        <TabsContent value="timetable">
+          <TimetableView />
         </TabsContent>
         <TabsContent value="buildings">
           <AdminShell section="buildings" />
@@ -298,5 +304,18 @@ function SignedInView({
       </Tabs>
     );
   }
-  return <StudentDashboard user={user} initialData={dashboard} />;
+  return (
+    <Tabs defaultValue="home">
+      <TabsList className="mb-4 flex flex-wrap h-auto">
+        <TabsTrigger value="home">Home</TabsTrigger>
+        <TabsTrigger value="timetable">Timetable</TabsTrigger>
+      </TabsList>
+      <TabsContent value="home">
+        <HomeScreen user={user} initialData={dashboard} />
+      </TabsContent>
+      <TabsContent value="timetable">
+        <TimetableView />
+      </TabsContent>
+    </Tabs>
+  );
 }

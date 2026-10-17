@@ -471,6 +471,21 @@ model Config {
   updatedAt  DateTime @updatedAt
 }
 
+// ---------- announcements (Home screen strip) ----------
+model Announcement {
+  id         String   @id @default(cuid())
+  title      String
+  body       String?
+  category   String   @default("general") // general|academic|spiritual|social|safety|admin
+  startsAt   DateTime @default(now())
+  endsAt     DateTime?
+  isPinned   Boolean  @default(false)
+  authorId   String?
+  createdAt  DateTime @default(now())
+
+  @@index([startsAt, endsAt])
+}
+
 model AuditLog {
   id        Int      @id @default(autoincrement())
   actorId   String?
