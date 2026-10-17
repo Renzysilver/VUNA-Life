@@ -26,6 +26,9 @@ import { FeedbackButton } from '@/components/social/feedback-button';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
 import { GateArrivalScene } from '@/components/gate/gate-arrival-scene';
+import { AvatarRenderer, type AvatarConfig, type EquippedItems } from '@/components/avatar/avatar-renderer';
+import { ProfileAvatar } from '@/components/avatar/profile-avatar';
+import { WardrobeScreen } from '@/components/wardrobe/wardrobe-screen';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -61,6 +64,9 @@ export default function Page() {
   const [peopleSubView, setPeopleSubView] = useState<'hellos' | 'chats'>('hellos');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [showGate, setShowGate] = useState(false);
+  const [showWardrobe, setShowWardrobe] = useState(false);
+  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig | null>(null);
+  const [equippedItems, setEquippedItems] = useState<EquippedItems | null>(null);
 
   // Check session on mount
   const refresh = useCallback(() => {
@@ -227,6 +233,16 @@ export default function Page() {
     return <GateArrivalScene onDone={() => setShowGate(false)} />;
   }
 
+  // ── Wardrobe overlay (Phase 7) ────────────────────────────────────────
+  if (showWardrobe) {
+    return (
+      <WardrobeScreen
+        onClose={() => setShowWardrobe(false)}
+        onBalanceChange={setWalletBalance}
+      />
+    );
+  }
+
   // ── Main app (inside AppShell) ─────────────────────────────────────────
   const { user } = state;
 
@@ -294,28 +310,41 @@ export default function Page() {
 
       {activeTab === 'profile' && (
         <div className="p-4 space-y-4">
-          {/* Mini profile */}
-          <div className="pt-8 text-center space-y-1">
-            <div
-              className="text-2xl font-bold"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              {user.displayName ?? user.username ?? user.email}
-            </div>
-            <div className="text-sm text-muted-foreground">{user.email}</div>
-            <div className="flex items-center justify-center gap-1.5 pt-1 flex-wrap">
-              {user.isVerifiedStudent && (
-                <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
-                  Verified student
-                </span>
-              )}
-              {user.isBeta && (
-                <span className="inline-block text-[11px] bg-accent/15 text-accent-foreground border border-accent/30 px-3 py-0.5 rounded-full font-medium">
-                  ⭐ Beta
-                </span>
-              )}
+          {/* Avatar (large) — fetches own equipped items */}
+          <div className="pt-6 flex flex-col items-center gap-3">
+            <ProfileAvatar size="large" />
+            <div className="text-center space-y-1">
+              <div
+                className="text-2xl font-bold"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                {user.displayName ?? user.username ?? user.email}
+              </div>
+              <div className="text-sm text-muted-foreground">{user.email}</div>
+              <div className="flex items-center justify-center gap-1.5 pt-1 flex-wrap">
+                {user.isVerifiedStudent && (
+                  <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
+                    Verified student
+                  </span>
+                )}
+                {user.isBeta && (
+                  <span className="inline-block text-[11px] bg-accent/15 text-accent-foreground border border-accent/30 px-3 py-0.5 rounded-full font-medium">
+                    ⭐ Beta
+                  </span>
+                )}
+              </div>
             </div>
           </div>
+
+          {/* My Wardrobe button */}
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full"
+            onClick={() => setShowWardrobe(true)}
+          >
+            🛍️ My Wardrobe
+          </Button>
 
           {/* Feedback button — always visible */}
           <div className="border-t pt-4">

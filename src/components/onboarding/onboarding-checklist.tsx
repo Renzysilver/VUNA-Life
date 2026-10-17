@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Circle, User, MailCheck, Palette, Sparkles } from 'lucide-react';
+import { BODY_TYPES, SKIN_TONES_LIST, AvatarRenderer, type AvatarConfig } from '@/components/avatar/avatar-renderer';
 
 type Props = {
   username: string | null;
@@ -25,42 +26,50 @@ type Props = {
   avatarPath: string | null;
 };
 
-const AVATAR_OPTIONS = [
-  { code: 'scholar', label: 'Scholar', emoji: '📚' },
-  { code: 'athlete', label: 'Athlete', emoji: '⚽' },
-  { code: 'creative', label: 'Creative', emoji: '🎨' },
-  { code: 'leader', label: 'Leader', emoji: '📋' },
-];
-
 export function OnboardingChecklist({ username, isVerified, avatarPath }: Props) {
   const { toast } = useToast();
-  const [pickedAvatar, setPickedAvatar] = useState<string | null>(avatarPath);
+  const [bodyType, setBodyType] = useState<string | null>(null);
+  const [skinTone, setSkinTone] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  // If all steps are done, don't render the checklist.
+  // avatarPath from Phase 6 doubles as "onboarding complete" flag.
+  // If it's set, we treat onboarding as done.
+  const lookPicked = !!(bodyType && skinTone);
   if (username && isVerified && avatarPath) return null;
 
   const steps = [
     { label: 'Set your username', done: !!username, icon: User },
     { label: 'Verify your student email', done: isVerified, icon: MailCheck },
-    { label: 'Pick your avatar path', done: !!avatarPath, icon: Palette },
+    { label: 'Pick your look (body type + skin tone)', done: lookPicked, icon: Palette },
   ];
 
   const allDone = steps.every((s) => s.done);
   if (allDone) return null;
 
-  const saveAvatar = async (code: string) => {
-    setPickedAvatar(code);
-    // Persist via /api/student/me PATCH (we'll add a simple update).
-    // For now, use the existing config pattern.
-    const res = await fetch('/api/student/me', {
-      method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ avatarPath: code }),
-    });
-    if (res.ok) {
-      toast({ title: 'Avatar path set!', description: AVATAR_OPTIONS.find(a => a.code === code)?.label });
+  const saveLook = async () => {
+    if (!bodyType || !skinTone) return;
+    setSaving(true);
+    try {
+      // Save avatar config (server-side only)
+      const res = await fetch('/api/avatar/config', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ bodyType, skinTone }),
+      });
+      const d = await res.json();
+      if (!d.ok) {
+        toast({ title: 'Could not save', description: d.message, variant: 'destructive' });
+        return;
+      }
+      toast({ title: '✓ Look saved!', description: 'Your avatar is ready.' });
+    } finally {
+      setSaving(false);
     }
   };
+
+  const config: AvatarConfig | null = bodyType && skinTone
+    ? { bodyType: bodyType as any, skinTone: skinTone as any }
+    : null;
 
   return (
     <Card className="border-accent/30 bg-accent/5">
@@ -87,27 +96,71 @@ export function OnboardingChecklist({ username, isVerified, avatarPath }: Props)
           </div>
         ))}
 
-        {/* Avatar picker */}
-        {!avatarPath && (
-          <div className="pt-2 space-y-2">
-            <div className="text-[11px] text-muted-foreground">Pick your avatar:</div>
-            <div className="grid grid-cols-4 gap-2">
-              {AVATAR_OPTIONS.map((opt) => (
-                <button
-                  key={opt.code}
-                  onClick={() => saveAvatar(opt.code)}
-                  className={cn(
-                    'flex flex-col items-center gap-1 p-2 rounded-xl border transition',
-                    pickedAvatar === opt.code
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border hover:border-primary/40',
-                  )}
-                >
-                  <span className="text-2xl">{opt.emoji}</span>
-                  <span className="text-[10px]">{opt.label}</span>
-                </button>
-              ))}
+        {/* Body type + skin tone picker (step 3) */}
+        {!lookPicked && (
+          <div className="pt-2 space-y-3">
+            {/* Live preview */}
+            <div className="flex justify-center">
+              <div className="rounded-xl bg-card border border-border p-2">
+                {config ? (
+                  <AvatarRenderer config={config} equipped={null} hairStage="Fresh" size="small" />
+                ) : (
+                  <div className="w-20 h-32 rounded-xl bg-muted grid place-items-center text-[10px] text-muted-foreground">
+                    Pick your look
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* Body type */}
+            <div className="space-y-1.5">
+              <div className="text-[11px] text-muted-foreground">Body type</div>
+              <div className="grid grid-cols-3 gap-2">
+                {BODY_TYPES.map((bt) => (
+                  <button
+                    key={bt.code}
+                    onClick={() => setBodyType(bt.code)}
+                    className={cn(
+                      'flex flex-col items-center gap-0.5 p-2 rounded-xl border text-[10px] transition',
+                      bodyType === bt.code
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/40',
+                    )}
+                  >
+                    <span className="text-lg">{bt.emoji}</span>
+                    <span>{bt.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Skin tone */}
+            <div className="space-y-1.5">
+              <div className="text-[11px] text-muted-foreground">Skin tone</div>
+              <div className="grid grid-cols-6 gap-2">
+                {SKIN_TONES_LIST.map((st) => (
+                  <button
+                    key={st.code}
+                    onClick={() => setSkinTone(st.code)}
+                    className={cn(
+                      'h-8 w-8 rounded-full border-2 transition',
+                      skinTone === st.code
+                        ? 'border-primary ring-2 ring-primary/30'
+                        : 'border-border',
+                    )}
+                    style={{ backgroundColor: st.code }}
+                    title={st.label}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Save button */}
+            {bodyType && skinTone && (
+              <Button size="sm" className="w-full" disabled={saving} onClick={saveLook}>
+                {saving ? 'Saving…' : 'Save my look'}
+              </Button>
+            )}
           </div>
         )}
       </CardContent>

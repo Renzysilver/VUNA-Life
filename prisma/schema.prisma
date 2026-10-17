@@ -466,14 +466,15 @@ model Fine {
 }
 
 model DaySummary {
-  id          String   @id @default(cuid())
-  userId      String
-  summaryDate DateTime
-  payload     String   // JSON string
-  shareToken  String?  @unique
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  summaryDate     DateTime
+  payload         String   // JSON string
+  shareToken      String?  @unique
+  avatarSnapshot  String?  // JSON: equippedItems snapshot at card generation
+  createdAt       DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, summaryDate])
 }
