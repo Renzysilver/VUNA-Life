@@ -1,22 +1,16 @@
 /**
- * page.tsx v2 — replaces the old tab-based layout entirely.
- *
- * Uses AppShell (fixed bottom nav) + per-tab screens.
- * The map is a real first-class tab, not a future phase.
- * Auth flow stays: sign-in → OTP → then AppShell.
- *
- * Adapted from the redesign pack's page-v2.tsx to match the existing
- * SignInForm (onRequestSent prop) and OtpConfirmForm (no message prop,
- * response.user not response.student) signatures — those auth component
- * files must NOT change per the redesign prompt.
+ * page.tsx — Phase 9 (Lagos Life architecture)
+ * - Full-screen game canvas, no phone bezel around the whole app
+ * - 4-tab nav: Home (dorm room) · Buy · Map · Phone (slide-up launcher)
+ * - Profile accessible via HUD avatar top-left
+ * - Phone launcher opens any app as a full-panel overlay
  */
 
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 import { AppShell, type AppTab } from '@/components/shell/app-shell';
-import { PhoneFrame } from '@/components/shell/PhoneFrame';
-import { HomeScreenV2 } from '@/components/home/home-screen-v2';
+import { HomeScreen } from '@/components/home/home-screen';
 import { MapScreen } from '@/components/map/map-screen';
 import { WalletScreen } from '@/components/wallet/wallet-screen';
 import { CanteenScreen } from '@/components/canteen/canteen-screen';
@@ -26,16 +20,15 @@ import { ChatsScreen } from '@/components/social/chats-screen';
 import { FeedbackButton } from '@/components/social/feedback-button';
 import { AdminShell } from '@/components/admin/admin-shell';
 import { LecturerScreen } from '@/components/lecturer/lecturer-screen';
-import { GateArrivalScene } from '@/components/gate/gate-arrival-scene';
-// GateArrivalScene is kept for potential future use but replaced by SplashScene in Phase 8.
-import { AvatarRenderer, type AvatarConfig, type EquippedItems } from '@/components/avatar/avatar-renderer';
 import { ProfileAvatar } from '@/components/avatar/profile-avatar';
 import { WardrobeScreen } from '@/components/wardrobe/wardrobe-screen';
 import { SignInForm } from '@/components/auth/sign-in-form';
 import { OtpConfirmForm, type VerifyResponse } from '@/components/auth/otp-confirm-form';
+import { PhoneLauncher } from '@/components/shell/phone-launcher';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TimetableView } from '@/components/timetable/timetable-view';
 
 // ── Auth state types ──────────────────────────────────────────────────────
 export type SessionInfo = {
@@ -58,19 +51,15 @@ type PageState =
   | { kind: 'requesting-otp'; email: string; demoOtp?: string; expiresInSec: number; message?: string }
   | { kind: 'signed-in'; user: SessionInfo };
 
-// ── Page ─────────────────────────────────────────────────────────────────
+// App panel opened from phone launcher
+type AppPanel = 'wallet' | 'messages' | 'timetable' | 'chapel' | 'hustle' | 'profile' | 'wardrobe' | 'people' | 'canteen' | null;
+
 export default function Page() {
   const [state, setState] = useState<PageState>({ kind: 'loading' });
   const [activeTab, setActiveTab] = useState<AppTab>('home');
-  const [walletSubView, setWalletSubView] = useState<'wallet' | 'canteen' | 'hustle'>('wallet');
-  const [peopleSubView, setPeopleSubView] = useState<'hellos' | 'chats'>('hellos');
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
-  const [showGate, setShowGate] = useState(false);
-  const [showWardrobe, setShowWardrobe] = useState(false);
-  const [avatarConfig, setAvatarConfig] = useState<AvatarConfig | null>(null);
-  const [equippedItems, setEquippedItems] = useState<EquippedItems | null>(null);
+  const [appPanel, setAppPanel] = useState<AppPanel>(null);
 
-  // Check session on mount
   const refresh = useCallback(() => {
     let cancelled = false;
     fetch('/api/student/me', { cache: 'no-store' })
@@ -95,74 +84,54 @@ export default function Page() {
             avatarPath: data.student.avatarPath ?? null,
           },
         });
-        // Check if the user needs to arrive at the gate today.
-        // Only for students (not admins/lecturers in admin mode).
-        if (data.student.role === 'student' || data.student.role === 'admin') {
-          fetch('/api/gate/arrive', {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ action: 'compute' }),
-          })
-            .then((r) => r.json())
-            .then((d) => {
-              if (d.ok && !d.alreadyArrived) {
-                setShowGate(true);
-              }
-            })
-            .catch(() => {});
-        }
       })
       .catch(() => { if (!cancelled) setState({ kind: 'signed-out' }); });
     return () => { cancelled = true; };
   }, []);
 
-  // Run on mount — useEffect, not useState(() => refresh()), so React 19's
-  // linter doesn't flag the setState-during-render pattern.
   useEffect(() => {
     return refresh();
   }, []);
 
-  // ── Auth screens (outside AppShell) ───────────────────────────────────
+  // Fetch wallet balance once signed in
+  useEffect(() => {
+    if (state.kind !== 'signed-in') return;
+    fetch('/api/wallet', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (d.ok) setWalletBalance(d.wallet.balance); })
+      .catch(() => {});
+  }, [state.kind]);
+
+  // ── Auth screens ──────────────────────────────────────────────────────
   if (state.kind === 'loading') {
     return (
-      <div className="min-h-screen bg-primary flex flex-col items-center justify-center gap-4">
-        <p className="text-primary-foreground font-bold text-xl"
-           style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-          VUNA Life
+      <div style={{ minHeight: '100svh', background: '#050d1a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 24, color: 'white', letterSpacing: 1 }}>
+          VUNA<span style={{ color: '#c9a227' }}>Life</span>
         </p>
-        <Skeleton className="h-2 w-24 rounded-full bg-white/20" />
+        <Skeleton className="h-2 w-24 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
       </div>
     );
   }
 
   if (state.kind === 'signed-out') {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        {/* Brand header */}
-        <div className="bg-primary px-6 pt-16 pb-10">
-          <h1
-            className="text-3xl font-bold text-white"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            VUNA Life
+      <div style={{ minHeight: '100svh', background: '#0a1628', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: '#2d6a4f', padding: '64px 24px 40px' }}>
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 32, color: 'white', margin: 0 }}>
+            VUNA<span style={{ color: '#c9a227' }}>Life</span>
           </h1>
-          <p className="text-white/60 text-sm mt-1">Veritas University Abuja</p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>Veritas University Abuja</p>
         </div>
-        <div className="flex-1 p-6">
+        <div style={{ flex: 1, padding: 24 }}>
           <SignInForm
-            // Adapted: existing SignInForm uses `onRequestSent` (single
-            // object arg). The redesign pack's page-v2.tsx used a different
-            // `onOtpRequested` signature; we use the existing component's
-            // signature here since auth files must not change.
-            onRequestSent={(r) =>
-              setState({
-                kind: 'requesting-otp',
-                email: r.email,
-                demoOtp: r.demoOtp,
-                expiresInSec: r.expiresInSec,
-                message: r.message,
-              })
-            }
+            onRequestSent={(r) => setState({
+              kind: 'requesting-otp',
+              email: r.email,
+              demoOtp: r.demoOtp,
+              expiresInSec: r.expiresInSec,
+              message: r.message,
+            })}
           />
         </div>
       </div>
@@ -171,27 +140,16 @@ export default function Page() {
 
   if (state.kind === 'requesting-otp') {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="bg-primary px-6 pt-16 pb-10">
-          <h1
-            className="text-3xl font-bold text-white"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            Check your email
-          </h1>
-          <p className="text-white/60 text-sm mt-1">{state.email}</p>
-          {state.message && (
-            <p className="text-white/50 text-xs mt-2 italic">{state.message}</p>
-          )}
+      <div style={{ minHeight: '100svh', background: '#0a1628', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: '#2d6a4f', padding: '64px 24px 40px' }}>
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 28, color: 'white', margin: 0 }}>Check your email</h1>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, marginTop: 4 }}>{state.email}</p>
         </div>
-        <div className="flex-1 p-6">
+        <div style={{ flex: 1, padding: 24 }}>
           <OtpConfirmForm
             email={state.email}
             demoOtp={state.demoOtp}
             expiresInSec={state.expiresInSec}
-            // Adapted: existing OtpConfirmForm response uses `r.user`
-            // (not `r.student`). The redesign pack's page-v2.tsx used
-            // `r.student` — we use the existing component's response shape.
             onVerified={(r: VerifyResponse) => {
               setState({
                 kind: 'signed-in',
@@ -209,19 +167,6 @@ export default function Page() {
                   avatarPath: (r as any).user.avatarPath ?? null,
                 },
               });
-              // Check gate arrival for the newly-signed-in user.
-              fetch('/api/gate/arrive', {
-                method: 'POST',
-                headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ action: 'compute' }),
-              })
-                .then((r) => r.json())
-                .then((d) => {
-                  if (d.ok && !d.alreadyArrived) {
-                    setShowGate(true);
-                  }
-                })
-                .catch(() => {});
             }}
             onBack={() => setState({ kind: 'signed-out' })}
           />
@@ -230,28 +175,6 @@ export default function Page() {
     );
   }
 
-  // ── Splash / Landing screen (Phase 8 — replaces gate scene) ──────────
-  if (showGate && state.kind === 'signed-in') {
-    return (
-      <PhoneFrame>
-        <SplashScene user={state.user} balance={walletBalance ?? 0} onContinue={() => setShowGate(false)} onNewLife={() => setShowGate(false)} />
-      </PhoneFrame>
-    );
-  }
-
-  // ── Wardrobe overlay (Phase 7) ────────────────────────────────────────
-  if (showWardrobe) {
-    return (
-      <PhoneFrame>
-        <WardrobeScreen
-          onClose={() => setShowWardrobe(false)}
-          onBalanceChange={setWalletBalance}
-        />
-      </PhoneFrame>
-    );
-  }
-
-  // ── Main app (inside AppShell) ─────────────────────────────────────────
   const { user } = state;
 
   const handleSignOut = async () => {
@@ -260,207 +183,97 @@ export default function Page() {
     setWalletBalance(null);
   };
 
-  return (
-    <PhoneFrame>
-    <AppShell
-      activeTab={activeTab}
-      onTabChange={(tab) => {
-        setActiveTab(tab);
-        // Reset wallet sub-view when leaving the wallet tab
-        if (tab !== 'wallet') setWalletSubView('wallet');
-        // Reset people sub-view when leaving the people tab
-        if (tab !== 'people') setPeopleSubView('hellos');
-      }}
-      balance={walletBalance}
-      online={user.isVerifiedStudent}
-    >
-      {activeTab === 'map' && (
-        <MapScreen />
-      )}
-
-      {activeTab === 'home' && (
-        <HomeScreenV2
-          user={user}
-          onNavigate={(route: string) => {
-            // Map home screen app routes to existing tabs
-            if (route === 'map') setActiveTab('map');
-            else if (route === 'wallet' || route === 'hustle') { setActiveTab('wallet'); if (route === 'hustle') setWalletSubView('hustle'); }
-            else if (route === 'people') setActiveTab('people');
-            else if (route === 'profile') setActiveTab('profile');
-            else if (route === 'wardrobe') setShowWardrobe(true);
-          }}
-          balanceNaira={walletBalance ?? 0}
-        />
-      )}
-
-      {activeTab === 'wallet' && (
-        walletSubView === 'canteen' ? (
-          <CanteenScreen />
-        ) : walletSubView === 'hustle' ? (
-          <HustleScreen onBalanceChange={setWalletBalance} />
-        ) : (
-          <WalletScreen
-            onGoToCanteen={() => setWalletSubView('canteen')}
-            onGoToHustle={() => setWalletSubView('hustle')}
-          />
-        )
-      )}
-
-      {activeTab === 'people' && (
-        peopleSubView === 'chats' ? (
-          <ChatsScreen />
-        ) : (
-          <div className="space-y-0">
-            <HellosScreen />
-            <div className="px-4 pb-2">
-              <Button
-                variant="default"
-                size="sm"
-                className="w-full"
-                onClick={() => setPeopleSubView('chats')}
-              >
-                View chats →
-              </Button>
-            </div>
-          </div>
-        )
-      )}
-
-      {activeTab === 'profile' && (
-        <div className="p-4 space-y-4">
-          {/* Avatar (large) — fetches own equipped items */}
-          <div className="pt-6 flex flex-col items-center gap-3">
-            <ProfileAvatar size="large" />
-            <div className="text-center space-y-1">
-              <div
-                className="text-2xl font-bold"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                {user.displayName ?? user.username ?? user.email}
-              </div>
-              <div className="text-sm text-muted-foreground">{user.email}</div>
-              <div className="flex items-center justify-center gap-1.5 pt-1 flex-wrap">
-                {user.isVerifiedStudent && (
-                  <span className="inline-block text-[11px] bg-primary/10 text-primary px-3 py-0.5 rounded-full font-medium">
-                    Verified student
-                  </span>
-                )}
-                {user.isBeta && (
-                  <span className="inline-block text-[11px] bg-accent/15 text-accent-foreground border border-accent/30 px-3 py-0.5 rounded-full font-medium">
-                    ⭐ Beta
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* My Wardrobe button */}
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={() => setShowWardrobe(true)}
-          >
-            🛍️ My Wardrobe
-          </Button>
-
-          {/* Feedback button — always visible */}
-          <div className="border-t pt-4">
-            <FeedbackButton />
-          </div>
-
-          {(user.role === 'lecturer' || user.role === 'admin') && (
-            <div className="border-t pt-4">
-              <h2
-                className="text-sm font-bold mb-3"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                Lecturer tools
-              </h2>
-              <LecturerScreen />
+  // ── App panel content (opened from phone launcher) ────────────────────
+  const renderAppPanel = () => {
+    if (!appPanel) return null;
+    return (
+      <div className="app-panel-overlay" onClick={e => { if (e.target === e.currentTarget) setAppPanel(null); }}>
+        <div className="app-panel-sheet">
+          <button className="app-panel-close" onClick={() => setAppPanel(null)}>✕</button>
+          {appPanel === 'wallet'    && <WalletScreen onGoToCanteen={() => setAppPanel('canteen')} onGoToHustle={() => setAppPanel('hustle')} />}
+          {appPanel === 'canteen'   && <CanteenScreen />}
+          {appPanel === 'hustle'    && <HustleScreen onBalanceChange={setWalletBalance} />}
+          {appPanel === 'messages'  && <ChatsScreen />}
+          {appPanel === 'timetable' && <TimetableView />}
+          {appPanel === 'people'    && <div className="space-y-0"><HellosScreen /></div>}
+          {appPanel === 'wardrobe'  && <WardrobeScreen onClose={() => setAppPanel(null)} onBalanceChange={setWalletBalance} />}
+          {appPanel === 'chapel'    && (
+            <div style={{ padding: 24, color: 'white' }}>
+              <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 22, fontWeight: 700 }}>⛪ Chapel Mass</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', marginTop: 8 }}>Mass schedule and check-in coming soon.</p>
             </div>
           )}
-
-          {user.role === 'admin' && (
-            <div className="border-t pt-4">
-              <h2
-                className="text-sm font-bold mb-3"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                Admin tools
-              </h2>
-              <Tabs defaultValue="buildings">
-                <TabsList className="mb-3 flex flex-wrap h-auto">
-                  <TabsTrigger value="buildings">Buildings</TabsTrigger>
-                  <TabsTrigger value="import">Import (CSV)</TabsTrigger>
-                  <TabsTrigger value="config">Config</TabsTrigger>
-                  <TabsTrigger value="audit">Audit log</TabsTrigger>
-                </TabsList>
-                <TabsContent value="buildings"><AdminShell section="buildings" /></TabsContent>
-                <TabsContent value="import"><AdminShell section="import" /></TabsContent>
-                <TabsContent value="config"><AdminShell section="config" /></TabsContent>
-                <TabsContent value="audit"><AdminShell section="audit" /></TabsContent>
-              </Tabs>
+          {appPanel === 'profile'   && (
+            <div style={{ padding: 24 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, paddingTop: 24 }}>
+                <ProfileAvatar size="large" />
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 22, fontWeight: 700, color: 'white' }}>
+                    {user.displayName ?? user.username ?? user.email}
+                  </div>
+                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{user.email}</div>
+                </div>
+              </div>
+              {user.role === 'admin' && (
+                <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 16 }}>
+                  <Tabs defaultValue="buildings">
+                    <TabsList className="mb-3">
+                      <TabsTrigger value="buildings">Buildings</TabsTrigger>
+                      <TabsTrigger value="import">Import</TabsTrigger>
+                      <TabsTrigger value="config">Config</TabsTrigger>
+                      <TabsTrigger value="audit">Audit</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="buildings"><AdminShell section="buildings" /></TabsContent>
+                    <TabsContent value="import"><AdminShell section="import" /></TabsContent>
+                    <TabsContent value="config"><AdminShell section="config" /></TabsContent>
+                    <TabsContent value="audit"><AdminShell section="audit" /></TabsContent>
+                  </Tabs>
+                </div>
+              )}
+              {(user.role === 'lecturer' || user.role === 'admin') && (
+                <div style={{ marginTop: 16 }}><LecturerScreen /></div>
+              )}
+              <div style={{ marginTop: 24 }}>
+                <FeedbackButton />
+              </div>
+              <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 16 }}>
+                <button onClick={handleSignOut} style={{ width: '100%', textAlign: 'center', fontSize: 14, color: 'rgba(255,255,255,0.4)', padding: '8px 0', background: 'none', border: 'none', cursor: 'pointer' }}>
+                  Sign out
+                </button>
+              </div>
             </div>
           )}
-
-          <div className="border-t pt-4">
-            <button
-              onClick={handleSignOut}
-              className="tap-target w-full text-center text-sm text-muted-foreground py-2"
-            >
-              Sign out
-            </button>
-          </div>
         </div>
-      )}
-    </AppShell>
-    </PhoneFrame>
-  );
-}
+      </div>
+    );
+  };
 
-// ── Phase 8: Splash / Landing screen ─────────────────────────────────────
-function SplashScene({ user, balance, onContinue, onNewLife }: { user: SessionInfo; balance: number; onContinue: () => void; onNewLife: () => void }) {
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  // ── Main game ─────────────────────────────────────────────────────────
   return (
-    <div className="splash-screen">
-      <div className="splash-bg" />
-      <div className="splash-logo">
-        <span style={{ color: 'white' }}>VUNA</span><span style={{ color: '#c9a227' }}>Life</span>
-        <div className="splash-tagline">Live your campus story.</div>
-      </div>
-      <div className="splash-room">
-        <DormRoomIllustration />
-      </div>
-      <div className="splash-player-card">
-        <div className="splash-avatar-mini">
-          <ProfileAvatar size="tiny" />
-        </div>
-        <div>
-          <div className="splash-player-name">{user.username ?? user.displayName ?? 'Student'}</div>
-          <div className="splash-player-sub">
-            {new Date().toLocaleDateString('en-NG', { weekday: 'long', day: 'numeric', month: 'short' })} · ₦{balance.toLocaleString('en-NG')}
+    <>
+      <AppShell
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        balance={walletBalance}
+        username={user.username ?? user.displayName}
+        onAvatarPress={() => setAppPanel('profile')}
+        phoneContent={
+          <PhoneLauncher onOpen={(id) => {
+            setAppPanel(id as AppPanel);
+          }} />
+        }
+      >
+        {activeTab === 'home' && <HomeScreen />}
+        {activeTab === 'map'  && <MapScreen />}
+        {activeTab === 'buy'  && (
+          <div style={{ height: '100%', background: '#0a1628' }}>
+            <CanteenScreen />
           </div>
-        </div>
-      </div>
-      <button className="splash-btn splash-btn--primary" onClick={onContinue}>Continue</button>
-      <button className="splash-btn splash-btn--ghost" onClick={onNewLife}>New life</button>
-      <div className="splash-socials"><span className="splash-official">✅ Official</span></div>
-    </div>
-  );
-}
+        )}
+      </AppShell>
 
-function DormRoomIllustration() {
-  return (
-    <div className="dorm-room-iso">
-      <div className="iso-floor" />
-      <div className="iso-wall-left" />
-      <div className="iso-wall-right" />
-      <div className="iso-bed"><div className="iso-bed-frame" /><div className="iso-bed-mattress" /><div className="iso-bed-pillow" /></div>
-      <div className="iso-desk"><div className="iso-desk-top" /></div>
-      <div className="iso-window"><div className="iso-window-pane" /></div>
-      <div className="iso-room-avatar" />
-    </div>
+      {/* App panel overlays (opened from phone launcher) */}
+      {renderAppPanel()}
+    </>
   );
 }

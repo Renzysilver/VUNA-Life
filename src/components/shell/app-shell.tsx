@@ -1,6 +1,9 @@
 /**
- * AppShell — phone-frame chrome (Phase 8 visual overhaul)
- * Bottom nav with emoji icons + green active pill.
+ * AppShell — Lagos Life-style layout
+ * - Full screen, no phone bezel
+ * - 4-tab bottom nav: Home · Buy · Map · Phone
+ * - HUD floats on top of the game canvas
+ * - Phone launcher slides up as 70% overlay
  */
 
 'use client';
@@ -8,27 +11,23 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-export type AppTab = 'map' | 'home' | 'wallet' | 'people' | 'profile';
+export type AppTab = 'home' | 'buy' | 'map' | 'phone';
 
 type Props = {
   activeTab: AppTab;
   onTabChange: (tab: AppTab) => void;
   balance: number | null;
-  online?: boolean;
+  username?: string | null;
   children: React.ReactNode;
+  phoneContent?: React.ReactNode; // the slide-up phone launcher
+  onAvatarPress?: () => void;
 };
 
-const NAV_ITEMS: { id: AppTab; label: string; emoji: string }[] = [
-  { id: 'map',     label: 'Campus',  emoji: '🗺️' },
-  { id: 'home',    label: 'Home',    emoji: '🏠' },
-  { id: 'wallet',  label: 'Wallet',  emoji: '💰' },
-  { id: 'people',  label: 'People',  emoji: '👥' },
-  { id: 'profile', label: 'Profile', emoji: '👤' },
-];
-
-export function AppShell({ activeTab, onTabChange, balance, online = false, children }: Props) {
+export function AppShell({ activeTab, onTabChange, balance, username, children, phoneContent, onAvatarPress }: Props) {
   const [clock, setClock] = useState('');
+  const [phoneOpen, setPhoneOpen] = useState(false);
 
+  // Keep clock ticking
   useEffect(() => {
     const tick = () => {
       const d = new Date();
@@ -39,27 +38,84 @@ export function AppShell({ activeTab, onTabChange, balance, online = false, chil
     return () => clearInterval(id);
   }, []);
 
-  return (
-    <div className="flex flex-col h-full bg-[#0a1628]" style={{ height: '100%' }}>
-      {/* Main content — fills phone frame, scrolls within */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" style={{ minHeight: 0 }}>
-        {children}
-      </main>
+  // When phone tab pressed, toggle phone overlay instead of switching content
+  const handleTabPress = (tab: AppTab) => {
+    if (tab === 'phone') {
+      setPhoneOpen(p => !p);
+      return;
+    }
+    setPhoneOpen(false);
+    onTabChange(tab);
+  };
 
-      {/* Bottom nav */}
-      <nav className="bottom-nav">
-        {NAV_ITEMS.map(({ id, label, emoji }) => {
-          const active = activeTab === id;
+  const NAV = [
+    { id: 'home' as AppTab,  label: 'Home',  icon: '🏠' },
+    { id: 'buy'  as AppTab,  label: 'Buy',   icon: '🛒' },
+    { id: 'map'  as AppTab,  label: 'Map',   icon: '🗺️' },
+    { id: 'phone'as AppTab,  label: 'Phone', icon: '📱' },
+  ];
+
+  return (
+    <div className="game-shell">
+
+      {/* ── Game canvas layer (fills entire screen) ── */}
+      <div className="game-canvas-layer">
+        {children}
+      </div>
+
+      {/* ── HUD overlay ── */}
+      <div className="hud-top">
+        {/* Left: avatar + time */}
+        <div className="hud-left" onClick={onAvatarPress}>
+          <div className="hud-avatar-dot" />
+          <div className="hud-time-block">
+            <span className="hud-clock">{clock}</span>
+          </div>
+        </div>
+
+        {/* Right: balance */}
+        <div className="hud-right">
+          <div className="hud-balance-pill">
+            <span className="hud-balance-amount">
+              ₦{(balance ?? 0).toLocaleString('en-NG')}
+            </span>
+            <button className="hud-add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Phone slide-up overlay ── */}
+      {phoneContent && (
+        <div className={cn('phone-launcher', phoneOpen && 'phone-launcher--open')}>
+          <div className="phone-launcher-handle" onClick={() => setPhoneOpen(false)} />
+          <div className="phone-launcher-header">
+            <span className="phone-launcher-time">{clock}</span>
+            <span className="phone-launcher-close" onClick={() => setPhoneOpen(false)}>✕ Close</span>
+          </div>
+          <div className="phone-launcher-body">
+            {phoneContent}
+          </div>
+        </div>
+      )}
+
+      {/* ── Scrim behind phone overlay ── */}
+      {phoneOpen && (
+        <div className="phone-scrim" onClick={() => setPhoneOpen(false)} />
+      )}
+
+      {/* ── Bottom nav ── */}
+      <nav className="game-nav">
+        {NAV.map(({ id, label, icon }) => {
+          const active = id === 'phone' ? phoneOpen : (activeTab === id && !phoneOpen);
           return (
             <button
               key={id}
-              onClick={() => onTabChange(id)}
-              className={cn('nav-item', active && 'nav-item--active')}
+              className={cn('game-nav-btn', active && 'game-nav-btn--active')}
+              onClick={() => handleTabPress(id)}
               aria-label={label}
-              aria-current={active ? 'page' : undefined}
             >
-              <span className="nav-item-icon">{emoji}</span>
-              <span className="nav-item-label">{label}</span>
+              <span className="game-nav-icon">{icon}</span>
+              <span className="game-nav-label">{label}</span>
             </button>
           );
         })}
